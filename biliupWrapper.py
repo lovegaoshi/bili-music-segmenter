@@ -319,6 +319,7 @@ from inaseg import extract_music, segment, extract_mah_stuff
 import os
 for media in rs:
     if media == '': continue
+    os.chdir('/tf/out')
     if 'https:' in media: media = ytbdl(media, soundonly = '', aria = 16)#, outdir = outdir
     extract_mah_stuff(media, extract_music(segment(media)), outdir = outdir, rev=False, soundonly = False)    
     print('inaseg completed on', media)
@@ -327,7 +328,6 @@ for media in rs:
     print('preparing to upload', stripped_media_names)
     #b站大小姐只想让我上传10p？？
     #well apparently biliup checks json at current DIR instead of its dir
-    os.chdir('/tf/out')
     bilibili_upload(stripped_media_names, os.path.basename(media), source = None, episode_limit=180)
     if cleanup:
         os.remove(media)
