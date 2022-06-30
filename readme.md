@@ -8,6 +8,12 @@ https://www.bilibili.com/video/BV1jY4y1s7mq
 
 https://www.bilibili.com/video/BV1HB4y1S7HX
 
+# Colab
+you can run this in Colab with free GPU resources! although colab's download speed is quite bad at 300kB/s. open this file:
+https://github.com/lovegaoshi/ipynb/blob/google-cloud/inaseg_google_colab.ipynb
+
+# Docker
+you can run this with docker (can do with gpu enabled)! just do docker pull gaoshi/inaseg:gpu.
 
 # Dependencies
 
