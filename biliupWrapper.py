@@ -43,11 +43,11 @@ def bilibili_upload(globbed, media_basename, source = None, description = None, 
             ]
         for x in globbed_episode_limit[i]: cmd.append(x)
         cmd.append('--copyright=2')
-        cmd.append('--desc="{}"'.format(description))
+        cmd.append('--desc={}'.format(description))
         cmd.append('--tid=31')
-        cmd.append('--tag="{}"'.format(','.join(tags)))
-        cmd.append('--title="[歌切]{}"'.format(media_basename[:media_basename.rfind('.')][:60] + episode_limit_prefix))
-        cmd.append('--source="{}"'.format(source))
+        cmd.append('--tag={}'.format(','.join(tags)))
+        cmd.append('--title=[歌切]{}'.format(media_basename[:media_basename.rfind('.')][:60] + episode_limit_prefix))
+        cmd.append('--source={}'.format(source))
         while cell_stdout(cmd) != 0:
             retry += 1
             if retry > 10: raise Exception('biliup failed for a total of {} times'.format(str(retry)))
@@ -84,27 +84,6 @@ keystamps = {
 }
                 #https://www.bilibili.com/video/BV12v4y1M7Vy
 rs = '''
-https://www.bilibili.com/video/BV1VU4y1Q7pd
-https://www.bilibili.com/video/BV1Ma411x7LE
-https://www.bilibili.com/video/BV1Sv4y1g7Jb
-https://www.bilibili.com/video/BV1ig411Q71Y
-https://www.bilibili.com/video/BV1WY4y1G7Gp
-https://www.bilibili.com/video/BV1WB4y1Q7wJ
-https://www.bilibili.com/video/BV1BW4y1r7xf
-https://www.bilibili.com/video/BV1j94y1m7SF
-https://www.bilibili.com/video/BV1wW4y1C7kx
-https://www.bilibili.com/video/BV1qr4y1x7sq
-https://www.bilibili.com/video/BV1p3411375L
-https://www.bilibili.com/video/BV1PY4y1V7Dc
-https://www.bilibili.com/video/BV153411P7X5
-https://www.bilibili.com/video/BV1jY4y1r7Sn
-https://www.bilibili.com/video/BV11B4y1C7KP
-https://www.bilibili.com/video/BV1Vu411r7qx
-https://www.bilibili.com/video/BV1AY4y1Y78B
-https://www.bilibili.com/video/BV1tT4y1a7zY
-https://www.bilibili.com/video/BV1qa411e7v3
-https://www.bilibili.com/video/BV13q4y1e7MG
-https://www.bilibili.com/video/BV1bZ4y1m73V
 https://www.bilibili.com/video/BV1a34y147WC
 https://www.bilibili.com/video/BV1m44y1A7UX
 https://www.bilibili.com/video/BV1Bu411v7Gf
@@ -321,7 +300,8 @@ for media in rs:
     if media == '': continue
     os.chdir('/tf/out')
     if 'https:' in media: media = ytbdl(media, soundonly = '', aria = 16)#, outdir = outdir
-    extract_mah_stuff(media, extract_music(segment(media)), outdir = outdir, rev=False, soundonly = False)    
+    if not cell_stdout(['python','inaseg.py', '--media={}'.format(media), '--outdir={}'.format(outdir), '--soundonly', '']) == 0: continue
+    #extract_mah_stuff(media, extract_music(segment(media)), outdir = outdir, rev=False, soundonly = False)    
     print('inaseg completed on', media)
     shazaming(outdir, media, threads = 4)
     stripped_media_names = strip_medianame_out(outdir, media)
@@ -334,3 +314,4 @@ for media in rs:
         for i in stripped_media_names: os.remove(i)
     print('finished stripping and uploading', media)
     if not cleanup: put_medianame_backin(stripped_media_names, media, shazamed = r'D:\tmp\ytd\convert2music', nonshazamed = r'D:\tmp\ytd\extract')
+

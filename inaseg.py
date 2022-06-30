@@ -427,6 +427,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     #media = ytbdl('')
     if not args.media is None: media = args.media
+    else: raise Exception('no media')
     if 'https:' in media: media = ytbdl(media, soundonly = args.soundonly, aria = args.aria, outdir = args.outdir)
     #media = r"D:\tmp\ytd\[莉犬くん【すとぷり】] 【激レア歌枠】とんでもないお知らせがあります。。。【莉犬】 20220607.webm"
     if len(glob.glob(os.path.join(args.outdir, '*' + os.path.splitext(os.path.basename(media))[0][1:] + '_*'))) == 0:
