@@ -23,7 +23,8 @@ Login as super user
 5. upload all files in this repo along with cookies.json into your VPS somehow (eg. the upload button in google cloud ssh's top right corner)
 6. chmod 777 both ./biliup and ./yt-dlp; otherwise there will be permission issues
 7. nano biliupWrapper.py and configure stream urls in and youtuber tags 
-8. make sure to run in a screen! then
+8. run a screen
+9. 
 
     sudo docker run --rm -it --mount type=bind,source="/home/{your user name}",target=/tf/out -u=1001:1002 gaoshi/inaseg:gpu python /tf/out/biliupWrapper.py
 
