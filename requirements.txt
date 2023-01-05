@@ -1,0 +1,6 @@
+yt-dlp
+inaspeechsegmenter
+shazamapi
+pyyaml
+filelock
+jupyter

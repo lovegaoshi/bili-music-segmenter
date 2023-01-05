@@ -1,0 +1,8 @@
+- extractor: biliseries
+  filter: null
+  last_url: https://www.bilibili.com/video/BV1wW4y1b7fW
+  url: https://space.bilibili.com/33576761/channel/seriesdetail?sid=2518895&ctype=0
+- extractor: null
+  filter: null
+  last_url: true
+  url: example2

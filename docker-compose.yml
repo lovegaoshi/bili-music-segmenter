@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  inaseg:
+    build: .
+    ports:
+      - "9527:8888"
+
+
+
+
+
