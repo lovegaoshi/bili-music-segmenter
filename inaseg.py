@@ -16,11 +16,15 @@ import gc
 import logging
 import math
 import tempfile
+import regex
 
 SAVE_YAML_PATH = os.path.join(
     os.path.dirname(
         os.path.abspath(__file__)),
     'save.yaml')
+
+class KoreanCharException(BaseException):
+    pass
 
 class TimestampMismatch(Exception):
     pass
@@ -126,9 +130,9 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
     if len(timestamps) > 0: print('timestamp assist', [ [timestamps[x][0], timestamps_ext[x][1], timestamps[x][1], ] for x in range(len(timestamps))])
     else: print('extracted timestamps', ['{} - {}'.format(x[0], x[1]) for x in timestamps_ext])
     
-    save = load_config('SAVE_YAML_PATH')
+    save = load_config(SAVE_YAML_PATH)
     save[os.path.basename(media)] = timestamps_ext
-    save_config('SAVE_YAML_PATH', save)
+    save_config(SAVE_YAML_PATH, save)
     nameswitch = False
     file = media
     filename = file[:file.rfind('.')]
@@ -191,6 +195,8 @@ def shazam(mp3, stop_at_first_match = 1, force_sleep = 5):
     return matches
 
 def legalize_filename(fn):
+    if regex.search(r'\p{IsHangul}',fn) is not None:
+        raise KoreanCharException(fn)
     illegal_list = [
         [':', ' '],
         ['"', ''],
@@ -437,12 +443,12 @@ def shazaming(outdir, media, shazam_coverart_path = '', shazam_func = shazam_ori
         for file in files:
             shazam_threaded(file, shazam_coverart_path = shazam_coverart_path, shazam_func = shazam_func, ignore_fails = ignore_fails)
 
-    save = load_config('SAVE_YAML_PATH')
+    save = load_config(SAVE_YAML_PATH)
     mediab = os.path.basename(media)
     save[os.path.basename(media) + "shazam"] = glob.glob(os.path.join(
         outdir, '*' + mediab[1:mediab.rfind('.')] + '*'
     ))
-    save_config('SAVE_YAML_PATH', save)
+    save_config(SAVE_YAML_PATH, save)
     
 def shazam_threaded(file, shazam_coverart_path = '', shazam_func = shazam_orig, ignore_fails = True):
     results = {}

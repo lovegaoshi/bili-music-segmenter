@@ -4,3 +4,4 @@ shazamapi
 pyyaml
 filelock
 jupyter
+regex
