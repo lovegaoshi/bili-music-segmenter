@@ -6,6 +6,7 @@ EXTRACT_SEG_THRES = 60
 EXTRACT_SEG_THRES_FINAL = 80
 # 识歌分段连接的阈值（秒），调大了会两首歌分不开 调小了会碎
 EXTRACT_SEG_CONNECT = 5
+COOKIES_LOCATION = ['--cookies-from-browser', 'firefox']
 
 # Load the API
 from inaSpeechSegmenter import Segmenter
@@ -257,13 +258,14 @@ def ytbdl(url: str, soundonly: str = '-f bestaudio', outdir: str = tempfile.gett
     fname = None
     #./youtube-dl
     cmd = ['yt-dlp', url, '-o', os.path.join(outdir, "[%(uploader)s] %(title)s %(upload_date)s.%(ext)s")]
+    cmd.extend(COOKIES_LOCATION)       
     if aria is not None: 
         cmd.append('--external-downloader')
         cmd.append('aria2c')
         cmd.append('--external-downloader-args')
-        cmd.append('-x {} -s {} -k 1M'.format(str(aria), str(aria)))        
+        cmd.append('-x {} -s {} -k 1M'.format(str(aria), str(aria)))
     if len(soundonly.split(' ')) > 1:
-        for i in soundonly.split(' '): cmd.append(i)
+        cmd.extend(soundonly.split(' '))
     print(cmd)
     with Popen(cmd, stdout=PIPE, 
                universal_newlines=True) as p:
