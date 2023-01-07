@@ -69,6 +69,7 @@ if __name__ == '__main__':
         time.sleep(args.watch_interval)
         logging.info(['biliWatcher loop has completed on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
         if args.watch_interval < 1: sys.exit(0)
+        logging.debug(['biliWatcher loop is now waiting for ', args.watch_interval])
         # p = subprocess.Popen(['python', 'biliupWrapper.py', '--media='+i])
         # p.wait()
     #url = r'https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0'
