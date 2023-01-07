@@ -38,7 +38,7 @@ def watch(config_dir=CONFIG_DIREC):
     return r
 
 if __name__ == '__main__':
-    from biliupWrapper import Biliup
+    from biliupWrapper import InaBiliup
     #print(watch())
     import argparse
     import sys
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     while True:
         for i in watch():
             print('calling biliupWrapper on', i)
-            Biliup(media=i).run()
+            InaBiliup(media=i).run()
         time.sleep(args.watch_interval)
         if args.watch_interval < 1: sys.exit(0)
         # p = subprocess.Popen(['python', 'biliupWrapper.py', '--media='+i])
