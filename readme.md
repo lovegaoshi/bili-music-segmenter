@@ -18,8 +18,12 @@ cd ipynb<br />
 sudo docker compose up<br />
 
 3b. 用biliup-rs登录b站账号<br />
-sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it ipynb-inaseg<br />
+sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it --rm ipynb-inaseg<br />
 ./biliup login<br />
+配置b站上传视频信息<br />
+nano configs/biliWrapper.json<br />
+nano configs/biliWatcher.yaml<br />
+
 
 4. 使用<br />
 切MP3，适用于自留，做https://steria.vplayer.tk/ 无需登录b站账号。<br />
