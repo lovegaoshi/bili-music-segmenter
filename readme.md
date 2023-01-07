@@ -17,14 +17,29 @@ git clone -b inaseg-cloud https://github.com/lovegaoshi/ipynb.git<br />
 cd ipynb<br />
 sudo docker compose up<br />
 
-3b. download and login into biliup-rs<br />
-python3 biliupdownload.py<br />
-./biliup login<br />
-if libssl1 is missing, it is installed in the tensorflow docker: <br />
+3b. 用biliup-rs登录b站账号<br />
 sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it ipynb-inaseg<br />
 ./biliup login<br />
 
 4. 使用<br />
+切MP3，适用于自留，做https://steria.vplayer.tk/ 无需登录b站账号。<br />
 sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 ipynb-inaseg python inaseg/inaseg.py --shazam --shazam_multithread=2 --cleanup --outdir=/inaseg --aria=8 --media={回放网址，或本地录播文件地址} <br />
+上传b站<br />
+sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/biliupWrapper.py --media https://www.bilibili.com/video/BV19W4y157Vj/<br />
+监控b站录播合集<br />
 
-wget -q -O - "https://github.com/ForgQi/biliup-rs/releases/download/v0.1.15/biliupR-v0.1.15-x86_64-linux.tar.xz" | tar xJ
+5.配置
+configs/biliWrapper.json：填b站投稿的相关信息。格式为：
+"VUP名": [
+        "VUP直播间（转载地址）",
+        "视频简介",
+        [
+            "视频标签"
+        ]
+    ],
+configs/biliWatcher.yaml：填监控的相关信息。格式为：
+- extractor: biliseries
+  filter: karaoke
+  last_url: true
+  url: b站录播合集url
+  

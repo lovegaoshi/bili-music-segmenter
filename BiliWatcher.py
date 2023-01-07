@@ -40,11 +40,21 @@ def watch(config_dir=CONFIG_DIREC):
 if __name__ == '__main__':
     from biliupWrapper import Biliup
     #print(watch())
+    import argparse
+    import sys
+    parser = argparse.ArgumentParser(description='ina music segment')
+    parser.add_argument(
+        '--watch_interval',
+        type=int,
+        default=0,
+        help='in seconds. 0 means no repeat.')
+    args = parser.parse_args()
     while True:
         for i in watch():
             print('calling biliupWrapper on', i)
             Biliup(media=i).run()
-        time.sleep(3600)
+        time.sleep(args.watch_interval)
+        if args.watch_interval < 1: sys.exit(0)
         # p = subprocess.Popen(['python', 'biliupWrapper.py', '--media='+i])
         # p.wait()
     #url = r'https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0'

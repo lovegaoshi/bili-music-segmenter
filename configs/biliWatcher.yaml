@@ -1,4 +1,4 @@
 - extractor: biliseries
   filter: karaoke
-  last_url: null
-  url: https://space.bilibili.com/1501380958/channel/seriesdetail?sid=1987844
+  last_url: true
+  url: https://space.bilibili.com/1112031857/channel/seriesdetail?sid=210571

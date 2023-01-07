@@ -133,14 +133,15 @@ class InaBiliup():
 
     def run(self):
         try:
-            # use biliup to renew the cookie file, and write to ytdlp netscape format.
-            subprocess.call(['./biliup', 'renew'])
-            biliup_to_ytbdl_cookie_write2file()
             media = self.media
             outdir = self.outdir
             if media == '': return
             os.chdir(outdir)
-            if 'https:' in media: media = ytbdl(media, soundonly='', aria=16)#, outdir = outdir
+            if 'https:' in media: 
+            # use biliup to renew the cookie file, and write to ytdlp netscape format.
+                subprocess.call(['./biliup', 'renew'])
+                biliup_to_ytbdl_cookie_write2file()
+                media = ytbdl(media, soundonly='', aria=16)#, outdir = outdir
             if not cell_stdout([
                 'python',
                 'inaseg.py',
@@ -175,7 +176,7 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description='ina music segment')
 parser.add_argument('--media', type=str, nargs='+', help='file path or weblink')
 if __name__ == '__main__':
-    logging.basicConfig(filename='inaseg.log', level=logging.DEBUG)
+    logging.basicConfig(filename='/inaseg/inaseg.log', level=logging.DEBUG)
     args = parser.parse_args()
     for media in args.media:
         logging.info(f'inaseging {media} at ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
