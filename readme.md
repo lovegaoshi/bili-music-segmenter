@@ -27,6 +27,7 @@ sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 ipynb-inaseg python inaseg/inas
 上传b站<br />
 sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/biliupWrapper.py --media https://www.bilibili.com/video/BV19W4y157Vj/<br />
 监控b站录播合集<br />
+sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=0<br />
 
 5.配置
 configs/biliWrapper.json：填b站投稿的相关信息。格式为：
