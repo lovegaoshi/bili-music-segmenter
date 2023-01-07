@@ -6,7 +6,7 @@ EXTRACT_SEG_THRES = 60
 EXTRACT_SEG_THRES_FINAL = 80
 # 识歌分段连接的阈值（秒），调大了会两首歌分不开 调小了会碎
 EXTRACT_SEG_CONNECT = 5
-COOKIES_LOCATION = ['--cookies-from-browser', 'firefox']
+COOKIES_LOCATION = ['--cookies', 'ytdlp_cookies.txt']
 
 # Load the API
 from inaSpeechSegmenter import Segmenter
