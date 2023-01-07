@@ -58,7 +58,11 @@ if __name__ == '__main__':
         help='in seconds. 0 means no repeat.')
     args = parser.parse_args()
     logging.basicConfig(filename='/inaseg/inaseg.log', level=args.log_level)
+    stream_logger = logging.StreamHandler()
+    stream_logger.setLevel(args.log_level)
+    logging.addHandler(stream_logger)
     while True:
+        logging.info(['biliWatcher loop has started on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
         for i in watch():
             logging.info(['calling biliupWrapper on', i, 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
             InaBiliup(media=i).run()
