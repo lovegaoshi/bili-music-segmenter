@@ -67,6 +67,7 @@ if __name__ == '__main__':
             logging.info(['calling biliupWrapper on', i, 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
             InaBiliup(media=i).run()
         time.sleep(args.watch_interval)
+        logging.info(['biliWatcher loop has completed on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
         if args.watch_interval < 1: sys.exit(0)
         # p = subprocess.Popen(['python', 'biliupWrapper.py', '--media='+i])
         # p.wait()
