@@ -57,10 +57,10 @@ if __name__ == '__main__':
         default=logging.INFO,
         help='in seconds. 0 means no repeat.')
     args = parser.parse_args()
-    logging.basicConfig(filename='/inaseg/inaseg.log', level=args.log_level)
-    stream_logger = logging.StreamHandler()
-    stream_logger.setLevel(args.log_level)
-    logging.addHandler(stream_logger)
+    logging.basicConfig(level=args.log_level, handlers=[
+        logging.FileHandler('/inaseg/inaseg.log'),
+        logging.StreamHandler()
+    ])
     while True:
         logging.info(['biliWatcher loop has started on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
         for i in watch():
