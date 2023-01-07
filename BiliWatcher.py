@@ -2,6 +2,9 @@ import time
 import os
 from inaConstant import WATCHER_CONFIG_DIR as CONFIG_DIREC
 from inaConstant import EXTRACTORS, FILTERS, load_config, save_config
+import logging
+from datetime import datetime
+
 DEFAULT_CONFIG = [{
     'url': 'example',
     'extractor': None,
@@ -48,10 +51,16 @@ if __name__ == '__main__':
         type=int,
         default=0,
         help='in seconds. 0 means no repeat.')
+    parser.add_argument(
+        '--log_level',
+        type=int,
+        default=logging.INFO,
+        help='in seconds. 0 means no repeat.')
     args = parser.parse_args()
+    logging.basicConfig(filename='/inaseg/inaseg.log', level=args.log_level)
     while True:
         for i in watch():
-            print('calling biliupWrapper on', i)
+            logging.info(['calling biliupWrapper on', i, 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
             InaBiliup(media=i).run()
         time.sleep(args.watch_interval)
         if args.watch_interval < 1: sys.exit(0)
