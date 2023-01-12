@@ -165,15 +165,14 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
             prefix = str(i).zfill(2)
             cmds.append([
                 'ffmpeg',
-                '-i',
-                "{}".format(file),
-            ] + encoding + [
                 '-ss',
                 timestamps_ext[i][0],
                 '-to',
                 timestamps_ext[i][1],
+                '-i',
+                "{}".format(file),
+            ] + encoding + [
                 "{}".format(os.path.join(oud, filename + '_' + prefix + fileext)),
-
             ])
     k = [Thread(target=ffmpeg, args=(x,)) for x in cmds]
     for i in k: i.start()
