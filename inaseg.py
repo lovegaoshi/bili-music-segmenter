@@ -150,14 +150,15 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
             prefix = timestamps[i][1].zfill(2)
             cmds.append([
                 'ffmpeg',
-                '-i',
-                "{}".format(file),
-                ] + encoding + [
                 '-ss',
                 timestamps[i][0],
                 '-to',
                 timestamps_ext[i][1],
-                "{}".format(os.path.join(oud, filename + '_{}_{}'.format(str(i), prefix) + fileext)),
+                '-i',
+                "{}".format(file),
+                '-reset_timestamps', '1',
+                ] + encoding + [                
+                "{}".format(os.path.join(oud, filename + '_{}_{}'.format(str(i).zfill(2), prefix) + fileext)),
 
             ] + encoding)
         except:
