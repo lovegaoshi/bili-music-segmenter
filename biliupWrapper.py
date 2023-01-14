@@ -10,16 +10,16 @@ from inaConstant import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 import multiprocessing
 
 def cell_stdout(cmd, silent=False, encoding=None):
-    logging.info('calling', cmd, 'in terminal:')
+    logging.info(['calling', cmd, 'in terminal:'])
     with subprocess.Popen(cmd, stdout=subprocess.PIPE,
                           universal_newlines=True, encoding=encoding) as p:
         if not silent:
             try:
                 for i in p.stdout:  # .decode("utf-8"):
-                    logging.info(i, end='')
+                    logging.info(i)
             except UnicodeDecodeError:
                 # 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
-                logging.info('decode failed! but at least you have this eror message...')
+                logging.warning('decode failed! but at least you have this eror message...')
         p.wait()
     return p.returncode
 
@@ -96,7 +96,7 @@ def bilibili_upload(
                     rescue.append(item)
             globbed_episode_limit[i] = rescue
             retry += 1
-            logging.warning('upload failed, retry attempt', retry)
+            logging.warning(['upload failed, retry attempt', retry])
             if retry > 5:
                 raise Exception(
                     'biliup failed for a total of {} times'.format(
@@ -114,7 +114,7 @@ class InaBiliup():
         media: str,
         outdir: str = '/inaseg',
         episode_limit: int = 180,
-        shazam_thread: int = max(1, min(4, multiprocessing.cpu_count())),
+        shazam_thread: int = min(max(multiprocessing.cpu_count(), 1), 4),
         ignore_errors: bool = True,
         sound_only: bool = False,
         route: str = BILIUP_ROUTE,
@@ -134,9 +134,11 @@ class InaBiliup():
 
     def run(self):
         try:
+
             media = self.media
             outdir = self.outdir
             if media == '': return
+            logging.info(f'inaseging {media} at ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             os.chdir(outdir)
             if 'https:' in media: 
             # use biliup to renew the cookie file, and write to ytdlp netscape format.
@@ -151,13 +153,13 @@ class InaBiliup():
                 '--soundonly','']) == 0:
                 raise BaseException()
             # inaseg failed?
-            logging.info('inaseg completed on', media)
+            logging.info(['inaseg completed on', media])
             # shazam 4 thread seems to be fine not triggering a ban
             shazaming(outdir, media, threads = self.shazam_thread)
             stripped_media_names = strip_medianame_out(outdir, media)
-            logging.info('preparing to upload', stripped_media_names)
+            logging.info(['preparing to upload', stripped_media_names])
             bilibili_upload(stripped_media_names, os.path.basename(media), source=None, episode_limit=self.episode_limit)
-            logging.info('finished stripping and uploading', media)
+            logging.info(['finished stripping and uploading', media])
             if self.cleanup:
                 os.remove(media)
                 for i in stripped_media_names: os.remove(i)
@@ -178,7 +180,10 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description='ina music segment')
 parser.add_argument('--media', type=str, nargs='+', help='file path or weblink')
 if __name__ == '__main__':
-    logging.basicConfig(filename='/inaseg/inaseg.log', level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, handlers=[
+        logging.FileHandler('/inaseg/inaseg.log'),
+        logging.StreamHandler()
+    ])
     args = parser.parse_args()
     for media in args.media:
         logging.info(f'inaseging {media} at ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
