@@ -57,6 +57,12 @@ def segment_wrapper(media: str, batch_size: int = 32, energy_ratio: float = 0.02
 def get_segment_process_length_array(filename: str, thres: int = 0):
     if not thres: return [[None, None]]
     file_length = timestamp2sec(get_length(filename))
+    if file_length == 0:
+        logging.warning(f'ffprobe on {filename} length failed. now extracting the audio \
+        and probing the resulting audio file.')
+        file_length = timestamp2sec(get_length_using_copied_audio(filename))
+        # something is wrong; happens with DDrecorder's raw streams.
+        # i just copy the audio segment and probe that one instead.
     if thres > file_length: return [[None, None]]
     logging.debug((f'filelength {str(file_length)} is larger than thres {str(thres)}, triggering a segmentation.'))
     result = [[ x * thres, (x + 1) * thres ] for x in range(math.ceil(file_length / thres))]
@@ -361,6 +367,31 @@ def get_length(filename):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
     return str(result.stdout)[2:-5] #float() without -sexagesimal
+
+def get_length_using_copied_audio(filename: str):
+    # ffmpeg -i '[帕莎Pasha] 突击歌回！ 2023-01-13 09-56-49.flv' -reset_timestamps 1 -vn -acodec copy test.flv
+    temp_audio_file = os.path.join(
+            tempfile.gettempdir(),
+            'get_length_acodec_temp.mp4'
+        )
+    try:
+        os.remove(temp_audio_file)
+    except OSError:
+        pass
+    subprocess.call([
+        'ffmpeg',
+        '-i',
+        filename,
+        '-reset_timestamps',
+        '1',
+        '-vn',
+        '-acodec',
+        'copy',
+        temp_audio_file,
+        ])
+    result = get_length(temp_audio_file)
+    os.remove(temp_audio_file)
+    return result
 
 def split_in_half(filename, ):
     length = timestamp2sec(get_length(filename))/2
