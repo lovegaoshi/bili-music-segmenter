@@ -1,4 +1,4 @@
-BILIUP_ROUTE = 'kodo'
+BILIUP_ROUTE = 'qn'
 
 import re
 import logging
@@ -29,7 +29,7 @@ def bilibili_upload(
         source=None,
         description=None,
         episode_limit=180,
-        route='kodo'):
+        route='qn'):
     # because my ytbdl template is always "[uploader] title.mp4" I can extract 
     # out uploader like this and use as a tag:
     try:
