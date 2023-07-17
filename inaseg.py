@@ -1,5 +1,5 @@
 # 媒体流最大时长处理（秒）；1G内存的进程推荐用10分钟/600秒，16G可以支持5小时，6GB VRAM可以支持5小时左右。
-SEGMENT_THRES = 600
+SEGMENT_THRES = 800
 # 识歌分段最小阈值（秒），调大了会漏 调小了会多杂谈
 EXTRACT_SEG_THRES = 60
 # 最终识歌分段最小阈值（秒），调大了漏TV size 调小了多杂谈
@@ -18,6 +18,7 @@ import logging
 import math
 import tempfile
 import regex
+from datetime import timedelta
 
 SAVE_YAML_PATH = os.path.join(
     os.path.dirname(
@@ -34,8 +35,7 @@ class TimestampMismatch(Exception):
 # any media supported by ffmpeg may be used (video, audio, urls)
 import json, shutil
 
-def segment(media, batch_size=32, energy_ratio=0.02, start_sec: int = None, stop_sec: int = None):
-    logging.info(('segmenting', media.encode('utf-8')))
+def segment(media, batch_size=64, energy_ratio=0.02, start_sec: int = None, stop_sec: int = None):
     segmenter = Segmenter(
         vad_engine='sm',
         detect_gender=False,
@@ -45,10 +45,11 @@ def segment(media, batch_size=32, energy_ratio=0.02, start_sec: int = None, stop
     return segmentation
 
 
-def segment_wrapper(media: str, batch_size: int = 32, energy_ratio: float = 0.02, segment_length_thres:int = 0):
+def segment_wrapper(media: str, batch_size: int = 32, energy_ratio: float = 0.03, segment_length_thres:int = 0):
     ''''''
     result = []
     for i in get_segment_process_length_array(media, segment_length_thres):
+        logging.info(['segmenting', media, 'from', sec2timestamp(i[0]), 'to', sec2timestamp(i[1])])
         result += segment(media, batch_size, energy_ratio, start_sec=i[0], stop_sec=i[1])
         gc.collect()
         tf.keras.backend.clear_session()
@@ -56,13 +57,17 @@ def segment_wrapper(media: str, batch_size: int = 32, energy_ratio: float = 0.02
 
 def get_segment_process_length_array(filename: str, thres: int = 0):
     if not thres: return [[None, None]]
-    file_length = timestamp2sec(get_length(filename))
+    try:
+        file_length = timestamp2sec(get_length(filename))
+    except:
+        file_length = 0
     if file_length == 0:
         logging.warning(f'ffprobe on {filename} length failed. now extracting the audio \
         and probing the resulting audio file.')
         file_length = timestamp2sec(get_length_using_copied_audio(filename))
         # something is wrong; happens with DDrecorder's raw streams.
         # i just copy the audio segment and probe that one instead.
+    logging.info((filename, 'total seconds', sec2timestamp(file_length)))
     if thres > file_length: return [[None, None]]
     logging.debug((f'filelength {str(file_length)} is larger than thres {str(thres)}, triggering a segmentation.'))
     result = [[ x * thres, (x + 1) * thres ] for x in range(math.ceil(file_length / thres))]
@@ -71,11 +76,11 @@ def get_segment_process_length_array(filename: str, thres: int = 0):
     return result
 
 def extract_music(segmentation, segment_thres = EXTRACT_SEG_THRES, segment_thres_final = EXTRACT_SEG_THRES_FINAL, 
-                  segment_connect = EXTRACT_SEG_CONNECT, start_padding = 1, end_padding = 2):
+                  segment_connect = EXTRACT_SEG_CONNECT, start_padding = 1, end_padding = 4):
     r = []
     #bridges noEnergy segments that are likely fragmented
     for i in range(len(segmentation)-2, 0, -1):
-        if segmentation[i][0] == 'noEnergy' and segmentation[i][2] - segmentation[i][1] < 2 and \
+        if segmentation[i][0] == 'noEnergy' and segmentation[i][2] - segmentation[i][1] < 4 and \
         segmentation[i-1][0] == segmentation[i+1][0]:
             segmentation[i-1] = (segmentation[i-1][0], segmentation[i-1][1], segmentation[i+1][2])
     for i in segmentation: 
@@ -125,7 +130,7 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
         if len(timestamps) > 0:# and len(timestamps) != len(timestamps_ext): 
             #raise TimestampMismatch('check timestamp assist', timestamps, timestamps_ext)
             #print('timestamp mismatch, removing missing ones...(come on, are you really gonna do this manually)')
-            print('checking timestamp correspondence and removing mismatched ones (come on, are you really gonna do this manually)')
+            logging.info('checking timestamp correspondence and removing mismatched ones (come on, are you really gonna do this manually)')
             timestamps = fix_missing_stamps(timestamps, timestamps_ext)
             timestamps_ext = fix_missing_stamps(timestamps_ext, timestamps)
             if len(timestamps) != len(timestamps_ext): 
@@ -134,9 +139,13 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
             pass
     except FileNotFoundError:
         pass
-    if len(timestamps) > 0: print('timestamp assist', [ [timestamps[x][0], timestamps_ext[x][1], timestamps[x][1], ] for x in range(len(timestamps))])
-    else: print('extracted timestamps', ['{} - {}'.format(x[0], x[1]) for x in timestamps_ext])
-    
+    if len(timestamps) > 0: logging.info(['timestamp assist', [ [timestamps[x][0], timestamps_ext[x][1], timestamps[x][1], ] for x in range(len(timestamps))]])
+    else: logging.info(['extracted timestamps', ['{} - {}'.format(x[0], x[1]) for x in timestamps_ext]])
+    try:
+        for count, x in enumerate(timestamps_ext):
+            logging.info(f'{str(count).zfill(2)}: {x[0]} - {x[1]}')
+    except:
+        pass
     save = load_config(SAVE_YAML_PATH)
     save[os.path.basename(media)] = timestamps_ext
     save_config(SAVE_YAML_PATH, save)
@@ -181,8 +190,10 @@ def extract_mah_stuff(media, segmented_stamps, outdir = None, rev = False, delim
                 "{}".format(os.path.join(oud, filename + '_' + prefix + fileext)),
             ])
     k = [Thread(target=ffmpeg, args=(x,)) for x in cmds]
-    for i in k: i.start()
-    k[-1].join()
+    for i in k: 
+        i.start()
+        i.join()
+    #k[-1].join()
     
 from ShazamAPI import Shazam
 import time, json
@@ -251,6 +262,7 @@ def concurrent_ffmpeg(target = 'ffmpeg'):
     return r
 
 def ffmpeg(cmd, concurrent_limit = multiprocessing.cpu_count(), wait = True):
+    logging.info(('calling', cmd, 'in terminal:'))
     process = subprocess.Popen(cmd)
     if wait: process.wait()
     return 1
@@ -272,16 +284,16 @@ def ytbdl(url: str, soundonly: str = '-f bestaudio', outdir: str = tempfile.gett
         cmd.append('-x {} -s {} -k 1M'.format(str(aria), str(aria)))
     if len(soundonly.split(' ')) > 1:
         cmd.extend(soundonly.split(' '))
-    print(cmd)
+    logging.info(cmd)
     with Popen(cmd, stdout=PIPE, 
                universal_newlines=True) as p:
         for line in p.stdout:
-            print(line, end='')
+            logging.info(line)
             if '[download] Destination' in line: fname = line[len('[download] Destination: '):-1]
             elif 'has already been downloaded' in line: fname = line[len('[download] '):-len(' has already been downloaded') - 1]
             elif '[Merger]' in line: fname = line[len('[Merger] Merging formats into "'):-2]
     if fname is None: raise Exception('no ytbdl resutls!')
-    print('mathcing', fname)
+    logging.info(['mathcing', fname])
     ext = fname[fname.rfind('.'):]
     ext = ext.split(' ')[0]
     r = []
@@ -321,6 +333,12 @@ def timestamp2sec(timestamp):
     for i in range(len(timestamp)): seconds += int(float(timestamp[i])) * pow(60, i)
     return seconds
 
+def sec2timestamp(sec):
+    try:
+        return str(timedelta(seconds=sec))
+    except:
+        return "infinity"
+        
 def is_stamp_missing(stamp, stamps, secrange = 40):
     stamp_sec = timestamp2sec(stamp[0])
     for i in stamps:
@@ -333,7 +351,7 @@ def fix_missing_stamps(stamps, stamps2):
     r = []
     for i in stamps:
         if not is_stamp_missing(i, stamps2): r.append(i)
-        else: print(i, 'is missing and gone(puff)')
+        else: logging.warning([i, 'is missing and gone(puff)'])
     return r
 
 import re
@@ -361,9 +379,18 @@ def mus1ca_timestamp(description, delimited = ' /'):
 def get_length(filename):
     if not filename:
         return "0"
-    result = subprocess.run(["ffprobe", "-v", "error",  '-sexagesimal', "-show_entries",
-                             "format=duration", "-of",
-                             "default=noprint_wrappers=1:nokey=1", filename],
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            '-sexagesimal',
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            filename
+        ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
     return str(result.stdout)[2:-5] #float() without -sexagesimal
@@ -489,15 +516,15 @@ def shazam_threaded(file, shazam_coverart_path = '', shazam_func = shazam_orig, 
     filename = file[:file.rfind('.')]
     fileext = file[len(filename):]
     fn = os.path.basename(filename)
-    print('shazaming', fn)
+    logging.info(['shazaming', fn])
     try:
         #match = shazam(file, stop_at_first_match = 1)[-1]
         #results[fn] = shazam_title(match)
         results[fn], match = shazam_func(file)
         try:
-            print(fn, 'shazam found to be', results[fn])
+            logging.info([fn, 'shazam found to be', results[fn]])
         except UnicodeEncodeError:
-                print(fn, 'shazam found but cant show unicode burr durr')
+                logging.warning([fn, 'shazam found but cant show unicode burr durr'])
         renamed_file = os.path.join(
             os.path.dirname(file),
             #    r'D:\tmp\ytd\convert2music',
@@ -506,7 +533,7 @@ def shazam_threaded(file, shazam_coverart_path = '', shazam_func = shazam_orig, 
         shutil.move(file, renamed_file)
         if os.path.isdir(shazam_coverart_path): shazam_coverart(match, renamed_file, shazam_coverart_path)
     except IndexError:
-        print(fn, 'shazam failed')
+        logging.error([fn, 'shazam failed'])
     except:
         if not ignore_fails: raise
 
@@ -527,7 +554,13 @@ if __name__ == '__main__':
         type=int,
         default=SEGMENT_THRES,
         help='for computers with limited RAM (eg a 5 hrs stream requires ~6GB VRAM), set this to process streams in this speficied segments to avoid ram overflow. in seconds.')
-
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        handlers=[
+            logging.FileHandler('/inaseg/inaseg_inst.log'),
+            logging.StreamHandler()
+        ])
     args = parser.parse_args()
     #media = ytbdl('')
     if not args.media is None: media = args.media
@@ -537,7 +570,8 @@ if __name__ == '__main__':
     if len(glob.glob(os.path.join(args.outdir, '*' + os.path.splitext(os.path.basename(media))[0][1:] + '_*'))) == 0:
         import tensorflow as tf
         gpus = tf.config.experimental.list_physical_devices('GPU')
-        print(gpus)
+        logging.info(gpus)
+        tf.get_logger().setLevel(logging.WARNING)
         if False and gpus:
         # Restrict TensorFlow to only allocate 1GB of memory on the first GPU: noope.
             try:
@@ -545,11 +579,11 @@ if __name__ == '__main__':
                     gpus[0],
                     [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=5424)])
                 logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-                print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+                logging.info([len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs"])
                 os.environ["TF_GPU_ALLOCATOR"]="cuda_malloc_async"
             except RuntimeError as e:
                 # Virtual devices must be set before GPUs have been initialized
-                print(e)
+                logging.error(e)
                 raise 
         try:
             timestamps = []
@@ -559,10 +593,10 @@ if __name__ == '__main__':
             saved_timestamp = None
         except TimestampMismatch:
             raise
-    else: print('segmentation', media, 'stopped to prevent posssible duplication')
-    print('segmentation', media, 'successful')
+    else: logging.warning(('segmentation', media, 'stopped to prevent posssible duplication'))
+    logging.info(['segmentation', media, 'successful'])
+    if args.cleanup and os.path.isfile(media): os.remove(media)
     if args.shazam: 
         shazaming(args.outdir, media, args.shazam_coverart, threads = args.shazam_multithread)
-    if args.cleanup: os.remove(media)
     import sys
     sys.exit(0)

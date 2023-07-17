@@ -6,6 +6,10 @@ import glob
 import re
 from datetime import datetime
 import logging
+import json
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+from wbi import get_query
 
 '''
 from inaConstant import EXTRACTORS
@@ -216,29 +220,63 @@ class BilibiliChannelCollectionsIE(BiliInfoExtractor):
     _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30'
 
 class BilibiliChannelIE(BiliInfoExtractor):
-    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/'
+    
+    _VALID_URL = 'https:\/\/space\.bilibili\.com\/(?P<userid>\d+)'#r'https?://space.bilibili\.com/(?P<userid>\d+)/'
     _GROUPED_BY = ['userid']
-    _API = r'https://api.bilibili.com/x/space/arc/search?mid={}&pn={page}&jsonp=jsonp'
+    _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50'
 
-    def extract_API1(
-                self,
-                *args,
-                stop_after: str = None,
-                time_wait = 0.5,
-                headers: dict = {}) -> list:
-        return super().extract_API(*args, stop_after=stop_after, time_wait=time_wait, headers=headers)
+    def extract_API(
+            self,
+            *args,
+            stop_after: str = None,
+            time_wait = 10,
+            headers: dict = {
+                'user-agent':'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '\
+                    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5060.134 Mobile Safari/537.36',
+            }) -> list:
+        r = []
+        for i in range(999):
+            apiurl = self._API.format(*args, page=str(i + 1))
+            parsed_url = urlparse(apiurl)
+            logging.debug(['extract API', apiurl])
+            print(parse_qs(parsed_url.query))
+            qs = parse_qs(parsed_url.query)
+            qs2 = {key: qs[key][0] for key in qs}
+            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{get_query(qs2)}'
+            print(['extract API', newapiurl])
+            k = requests.get(newapiurl, headers=headers)
+            parsed, return_signal = self.parse_json(json_obj=k, stop_after=stop_after)
+            r += parsed
+            if return_signal:
+                return r
+            time.sleep(time_wait)
+        return r
 
     def parse_json(self, json_obj: dict, stop_after: bool = None) -> tuple:
         r = []
-        for i in json_obj.json()['data']['list']['vlist']:
-            if r'https://www.bilibili.com/video/{}'.format(
-                    i['bvid']) == stop_after:
-                return r, True
-            r.append(
-                [i['title'], r'https://www.bilibili.com/video/{}'.format(i['bvid'])])
-            if stop_after is True:
-                return r, True
-        return r, len(r) == 0
+        try:
+            if hasattr(json_obj, 'json'):
+                jsonified_json = json_obj.json()
+            else:
+                jsonified_json = json_obj
+            for i in jsonified_json['data']['list']['vlist']:
+                if r'https://www.bilibili.com/video/{}'.format(
+                        i['bvid']) == stop_after:
+                    return r, True
+                r.append(
+                    [i['title'], r'https://www.bilibili.com/video/{}'.format(i['bvid'])])
+                if stop_after is True:
+                    return r, True
+            return r, len(r) == 0
+        except requests.exceptions.JSONDecodeError:
+            json_txt = json_obj.text
+            if '"code":-509,' in json_txt:
+                logging.warn('triggered code -509')
+                return self.parse_json(
+                    json.loads(json_txt[json_txt.index('}') + 1:]),
+                    stop_after
+                )
+            raise
 
 class localGlob(Extractor):
     '''
