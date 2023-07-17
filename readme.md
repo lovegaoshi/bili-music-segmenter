@@ -16,10 +16,21 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 free -h
 ```
-3a. 安装docker镜像
+
+NOTE: you may or may not need sudo to perform docker commands.
+
+NOTE: all docker commands below contains the user name and group id. these are mapped to 1001:1001 as they are the defaults for oracle servers. If you cannot locate this information, simply remove them and run the docker container under root. 
+
+NOTE: for windows servers, run `${pwd}` instead of `"$(pwd)"`
+
+3. git clone repo
 ```
 git clone -b inaseg-cloud https://github.com/lovegaoshi/ipynb.git
 cd ipynb
+```
+
+3a. 安装docker镜像
+```
 sudo docker compose up
 ```
 OR:
@@ -28,16 +39,15 @@ OR:
 
 https://hub.docker.com/repository/docker/gaoshi/ipynb-inaseg/tags?page=1&ordering=last_updated
 
-**biliup-rs >v0.16 requires ubuntu 22, which only tensorflow/nightly uses**
 ```
-docker pull gaoshi/ipynb-inaseg:nightly
+sudo docker pull gaoshi/ipynb-inaseg:nightly
+sudo docker tag gaoshi/ipynb-inaseg:nightly ipynb-inaseg
 ```
-
 
 4. 用biliup-rs登录b站账号
-```sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it --rm ipynb-inaseg
-python initialize.py
-./biliup login
+```
+sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it --rm ipynb-inaseg
+biliup login
 ```
 ```
 nano configs/biliWrapper.json
@@ -81,3 +91,13 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 监控b站录播合集
 
 `sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=0`
+
+7. Extras
+
+Q: better system? more RAM?
+
+change batch_size: `segment_wrapper(media: str, batch_size: int = 32` in `inaseg.py` from `32` to something large like `128` or `512`; a larger batch may have 100% performance increase.
+
+change media sliding window size: `SEGMENT_THRES = 600` in `inaseg.py` to something large; this is the largest media chunk to be processed in seconds. a larger chunk will save disk read.
+
+Q: CUDA supported?

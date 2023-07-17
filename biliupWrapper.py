@@ -77,7 +77,7 @@ def bilibili_upload(
             episode_limit_prefix = ''
         retry = 0
         cmd = [
-                './biliup',
+                'biliup',
                 'upload',
             ]
         for x in globbed_episode_limit[i]: cmd.append(x)
@@ -142,7 +142,7 @@ class InaBiliup():
             os.chdir(outdir)
             if 'https:' in media: 
             # use biliup to renew the cookie file, and write to ytdlp netscape format.
-                subprocess.call(['./biliup', 'renew'])
+                subprocess.call(['biliup', 'renew'])
                 biliup_to_ytbdl_cookie_write2file()
                 media = ytbdl(media, soundonly='', aria=16)#, outdir = outdir
             if not cell_stdout([

@@ -1,8 +1,3 @@
-from inaSpeechSegmenter import Segmenter
-Segmenter(
-        vad_engine='sm',
-        detect_gender=False)
-
 import subprocess
 import tarfile
 import glob
@@ -14,4 +9,4 @@ biliup_tar_path = glob.glob('biliupR*')[0]
 tarfile.open(biliup_tar_path).extractall()
 os.remove(biliup_tar_path)
 for file in glob.glob('biliupR*/*'):
-    os.rename(file, os.path.join(os.getcwd(), os.path.basename(file)))
+    os.rename(file, os.path.join('/bin', os.path.basename(file)))
