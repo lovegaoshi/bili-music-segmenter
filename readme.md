@@ -16,10 +16,17 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 free -h
 ```
-3a. 安装docker镜像
+
+NOTE: you may or may not need sudo to perform docker commands.
+
+3. git clone repo
 ```
 git clone -b inaseg-cloud https://github.com/lovegaoshi/ipynb.git
 cd ipynb
+```
+
+3a. 安装docker镜像
+```
 sudo docker compose up
 ```
 OR:
@@ -28,14 +35,14 @@ OR:
 
 https://hub.docker.com/repository/docker/gaoshi/ipynb-inaseg/tags?page=1&ordering=last_updated
 
-**biliup-rs >v0.16 requires ubuntu 22, which only tensorflow/nightly uses**
 ```
-docker pull gaoshi/ipynb-inaseg:nightly
+sudo docker pull gaoshi/ipynb-inaseg:nightly
+sudo docker tag gaoshi/ipynb-inaseg:nightly ipynb-inaseg
 ```
-
 
 4. 用biliup-rs登录b站账号
-```sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it --rm ipynb-inaseg
+```
+sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 -it --rm ipynb-inaseg
 python initialize.py
 ./biliup login
 ```
