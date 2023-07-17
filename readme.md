@@ -92,3 +92,13 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 监控b站录播合集
 
 `sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=0`
+
+7. Extras
+
+Q: better system? more RAM?
+
+change batch_size: `segment_wrapper(media: str, batch_size: int = 32` in `inaseg.py` from `32` to something large like `128` or `512`; a larger batch may have 100% performance increase.
+
+change media sliding window size: `SEGMENT_THRES = 600` in `inaseg.py` to something large; this is the largest media chunk to be processed in seconds. a larger chunk will save disk read.
+
+Q: CUDA supported?
