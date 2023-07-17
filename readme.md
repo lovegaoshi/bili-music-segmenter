@@ -19,6 +19,8 @@ free -h
 
 NOTE: you may or may not need sudo to perform docker commands.
 
+NOTE: all docker commands below contains the user name and group id. these are mapped to 1001:1001 as they are the defaults for oracle servers. If you cannot locate this information, simply remove them and run the docker container under root. 
+
 3. git clone repo
 ```
 git clone -b inaseg-cloud https://github.com/lovegaoshi/ipynb.git
