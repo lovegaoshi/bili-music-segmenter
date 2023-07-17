@@ -90,7 +90,7 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 
 监控b站录播合集
 
-`sudo docker compose up -d`
+`sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=12800`
 
 7. Extras
 
@@ -119,3 +119,5 @@ python3
 import tensorflow as tf
 print(tf.config.list_physical_devices('GPU'))
 ```
+
+note that your computer's CUDA version might need to be larger than the CUDA version in docker
