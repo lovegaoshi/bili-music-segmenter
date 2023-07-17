@@ -2,10 +2,15 @@ version: "3.9"
 services:
   inaseg:
     build: .
-    ports:
-      - "9527:8888"
-
-
-
-
-
+    volumes:
+      - .:/inaseg
+    user: "1001:1001"
+    command: python /inaseg/BiliWatcher.py --watch_interval=43200
+    restart: unless-stopped
+  inacelery:
+    build: .
+    volumes:
+      - .:/inaseg
+    user: "1001:1001"
+    command: celery -A inacelery worker -c 1 --loglevel=info
+    restart: unless-stopped

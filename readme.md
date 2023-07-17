@@ -31,7 +31,7 @@ cd ipynb
 
 3a. 安装docker镜像
 ```
-sudo docker compose up
+sudo docker build .
 ```
 OR:
 
@@ -90,7 +90,7 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 
 监控b站录播合集
 
-`sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=0`
+`sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=12800`
 
 7. Extras
 
@@ -100,4 +100,24 @@ change batch_size: `segment_wrapper(media: str, batch_size: int = 32` in `inaseg
 
 change media sliding window size: `SEGMENT_THRES = 600` in `inaseg.py` to something large; this is the largest media chunk to be processed in seconds. a larger chunk will save disk read.
 
-Q: CUDA supported?
+Q: has CUDA?
+
+pull this image instead:
+
+```
+sudo docker pull gaoshi/ipynb-inaseg:nightly-gpu
+sudo docker tag gaoshi/ipynb-inaseg:nightly-gpu ipynb-inaseg
+```
+
+when running docker, add `--gpus all`.
+
+to check if GPU is enabled, run:
+
+```
+sudo docker run -v "$(pwd)":/inaseg -it --rm ipynb-inaseg
+python3
+import tensorflow as tf
+print(tf.config.list_physical_devices('GPU'))
+```
+
+note that your computer's CUDA version might need to be larger than the CUDA version in docker

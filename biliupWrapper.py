@@ -1,4 +1,8 @@
-BILIUP_ROUTE = 'qn'
+DEFAULT_SETTINGS = {
+    "biliup_routes": ['qn'],
+}
+BILIUP_ROUTE = 'qn' #'kodo'
+RETRY_ROUTES = DEFAULT_SETTINGS['biliup_routes']
 
 import re
 import logging
@@ -8,6 +12,7 @@ import subprocess
 from cookieformatter import biliup_to_ytbdl_cookie_write2file
 from inaConstant import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 import multiprocessing
+from inacelery import add
 
 def cell_stdout(cmd, silent=False, encoding=None):
     logging.info(['calling', cmd, 'in terminal:'])
@@ -16,7 +21,7 @@ def cell_stdout(cmd, silent=False, encoding=None):
         if not silent:
             try:
                 for i in p.stdout:  # .decode("utf-8"):
-                    logging.info(i)
+                    logging.debug(i)
             except UnicodeDecodeError:
                 # 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
                 logging.warning('decode failed! but at least you have this eror message...')
@@ -29,9 +34,11 @@ def bilibili_upload(
         source=None,
         description=None,
         episode_limit=180,
-        route='qn'):
+        route='qn',
+        useCelery = False):
     # because my ytbdl template is always "[uploader] title.mp4" I can extract 
     # out uploader like this and use as a tag:
+    keystamps = json.load(open(CONFIG_DIREC, encoding='utf-8'))
     try:
         ripped_from = re.compile(r'\[(.+)\].+').match(media_basename).group(1)
         #ripped_from = re.findall(r'\[.+\]', media_basename)[0][1:-1]
@@ -89,6 +96,37 @@ def bilibili_upload(
         cmd.append('--source={}'.format(source))
         cmd.append('-l=' + route)
 
+        if useCelery:
+            # use inaCelery
+            relocated_dir_on_fail = os.path.join(
+                os.path.dirname(globbed_episode_limit[i][0]),
+                'inaupload',
+                f'{title.replace(" ", "_")}'
+            )
+            os.mkdir(relocated_dir_on_fail)
+            for item in globbed_episode_limit[i]:
+                os.rename(item, os.path.join(relocated_dir_on_fail, os.path.basename(item)))
+
+            for index, item in enumerate(globbed_episode_limit[i]):
+                globbed_episode_limit[i][index] = os.path.join(relocated_dir_on_fail, os.path.basename(item))
+            cmd = [
+                    'biliup',
+                    'upload',
+                ]
+            for x in globbed_episode_limit[i]: cmd.append(x)
+            cmd.append('--copyright=2')
+            cmd.append('--desc={}'.format(description))
+            cmd.append('--tid=31')
+            cmd.append('--tag={}'.format(','.join(tags)))
+            cmd.append('--title=[歌切]{}'.format(title[:60] + episode_limit_prefix))
+            cmd.append('--source={}'.format(source))
+            cmd.append('-l=' + route)
+            logging.info(['deferring', cmd, 'to celery:'])
+            with open(os.path.join(relocated_dir_on_fail, 'cmd.txt'), 'w') as f:
+                json.dump(cmd, f)
+            add.delay(json.dumps(cmd))
+            return
+        
         while cell_stdout(cmd, encoding="utf-8") != 0:
             rescue = []
             for item in globbed_episode_limit[i]:
@@ -97,7 +135,13 @@ def bilibili_upload(
             globbed_episode_limit[i] = rescue
             retry += 1
             logging.warning(['upload failed, retry attempt', retry])
-            if retry > 5:
+            route = RETRY_ROUTES[retry % len(RETRY_ROUTES)]
+            if retry > 15:
+                relocated_dir_on_fail = f'{title.replace(" ", "_")}'
+                os.mkdir(relocated_dir_on_fail)
+                for item in globbed_episode_limit[i]:
+                    os.rename(item, os.path.join(relocated_dir_on_fail, os.path.basename(item)))
+                logging.warning(f'max retry of {retry} reached. files have been moved to {relocated_dir_on_fail}.')
                 raise Exception(
                     'biliup failed for a total of {} times'.format(
                         str(retry)))
@@ -105,7 +149,6 @@ def bilibili_upload(
 #AIO 一键url to b站上传
 #=================================================================================================================
 
-keystamps = json.load(open(CONFIG_DIREC, encoding='utf-8'))
 
 class InaBiliup():
 
@@ -150,7 +193,8 @@ class InaBiliup():
                 'inaseg.py',
                 '--media={}'.format(media),
                 '--outdir={}'.format(outdir),
-                '--soundonly','']) == 0:
+                '--soundonly','',
+                '--cleanup']) == 0:
                 raise BaseException()
             # inaseg failed?
             logging.info(['inaseg completed on', media])
@@ -161,7 +205,7 @@ class InaBiliup():
             bilibili_upload(stripped_media_names, os.path.basename(media), source=None, episode_limit=self.episode_limit)
             logging.info(['finished stripping and uploading', media])
             if self.cleanup:
-                os.remove(media)
+                if os.path.isfile(media): os.remove(media)
                 for i in stripped_media_names: os.remove(i)
             else: put_medianame_backin(stripped_media_names, media, shazamed=r'D:\tmp\ytd\convert2music', nonshazamed=r'D:\tmp\ytd\extract')
         except KeyboardInterrupt:
@@ -169,7 +213,8 @@ class InaBiliup():
         except BaseException:
             if self.ignore_errors:
                 for i in glob.glob('*.mp4') + glob.glob('*.aria2') + glob.glob('*.part'): os.remove(i)
-                if os.path.isfile(media): os.remove(media)
+                # if os.path.isfile(media): os.remove(media)
+                logging.error(f'{media} failed. file is removed in automatic error ignore handler')
             else:
                 raise
 

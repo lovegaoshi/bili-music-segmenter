@@ -1,4 +1,11 @@
 
-__pycache__/inaseg.cpython-38.pyc
-cookies.json
+__pycache__
 *.pyc
+
+cookies.json
+
+inaupload
+!inaupload/inaupload.md
+
+*.sqlite
+*.log
