@@ -121,3 +121,10 @@ print(tf.config.list_physical_devices('GPU'))
 ```
 
 note that your computer's CUDA version might need to be larger than the CUDA version in docker
+
+Q: speed tests
+
+inaseg for an 1 hour media file: 
+Oracle E2.micro(1C2T): ~1hr
+AMD Ryzen 3700X(8C16T): ~2min?
+NVIDIA 1070, 2070S: < 20s
