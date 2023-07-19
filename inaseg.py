@@ -285,13 +285,22 @@ def ytbdl(url: str, soundonly: str = '-f bestaudio', outdir: str = tempfile.gett
     if len(soundonly.split(' ')) > 1:
         cmd.extend(soundonly.split(' '))
     logging.info(cmd)
-    with Popen(cmd, stdout=PIPE, 
-               universal_newlines=True) as p:
-        for line in p.stdout:
-            logging.info(line)
-            if '[download] Destination' in line: fname = line[len('[download] Destination: '):-1]
-            elif 'has already been downloaded' in line: fname = line[len('[download] '):-len(' has already been downloaded') - 1]
-            elif '[Merger]' in line: fname = line[len('[Merger] Merging formats into "'):-2]
+    passed_download = False
+    while not passed_download:
+        with Popen(cmd, stdout=PIPE, 
+                universal_newlines=True) as p:
+            for line in p.stdout:
+                logging.info(line)
+                if '[download] Destination' in line:
+                    fname = line[len('[download] Destination: '):-1]
+                elif 'has already been downloaded' in line: 
+                    fname = line[len('[download] '):-len(' has already been downloaded') - 1]
+                elif '[Merger]' in line: 
+                    fname = line[len('[Merger] Merging formats into "'):-2]
+                elif "error" in line.lower():
+                    passed_download = False
+            if not passed_download:
+                time.sleep(10)
     if fname is None: raise Exception('no ytbdl resutls!')
     logging.info(['mathcing', fname])
     ext = fname[fname.rfind('.'):]
