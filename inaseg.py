@@ -287,6 +287,7 @@ def ytbdl(url: str, soundonly: str = '-f bestaudio', outdir: str = tempfile.gett
     logging.info(cmd)
     passed_download = False
     while not passed_download:
+        passed_download = True
         with Popen(cmd, stdout=PIPE, 
                 universal_newlines=True) as p:
             for line in p.stdout:
