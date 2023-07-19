@@ -63,7 +63,7 @@ if __name__ == '__main__':
     ])
     while True:
         logging.info(['biliWatcher loop has started on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
-        for i in watch():
+        for i in reversed(watch()):
             logging.info(['calling biliupWrapper on', i, 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
             InaBiliup(media=i).run()
         logging.info(['biliWatcher loop has completed on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
