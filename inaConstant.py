@@ -57,7 +57,7 @@ def initialize_config(
         return default
 
 
-def load_config(config_dir: str, default: dict={}, encoding: str='utf-8') -> dict:
+def load_config(config_dir: str, default: dict = {}, encoding: str = 'utf-8') -> dict:
     try:
         try:
             return yaml.safe_load(open(config_dir, 'r', encoding=encoding))
@@ -67,13 +67,15 @@ def load_config(config_dir: str, default: dict={}, encoding: str='utf-8') -> dic
         return initialize_config(config_dir, default, reset=True)
 
 
-def save_config(config_dir: str, default: dict={}) -> None:
-    try: os.replace(config_dir, config_dir + '.old', )
-    except FileNotFoundError: pass 
+def save_config(config_dir: str, default: dict = {}) -> None:
+    try:
+        os.replace(config_dir, config_dir + '.old', )
+    except FileNotFoundError:
+        pass
     yaml.dump(default, open(config_dir, 'w'),)
 
 
-def bkup_config(config_dir: str, encoding: str='utf-8', backup_day: int = 7) -> None:
+def bkup_config(config_dir: str, encoding: str = 'utf-8', backup_day: int = 7) -> None:
     try:
         c = yaml.safe_load(open(config_dir, 'r', encoding=encoding))
         if not 'created-time' in c:
@@ -90,6 +92,7 @@ def bkup_config(config_dir: str, encoding: str='utf-8', backup_day: int = 7) -> 
     except:
         pass
 
+
 class Extractor():
     _VALID_URL = r'(?P<some_name>.+)'
     _GROUPED_BY = ['some_name']
@@ -98,41 +101,48 @@ class Extractor():
     def extract_API(self, *args, **kwargs):
         raise Exception('not defined!')
 
-    def extract(self, url: str, last_url: str=None):
+    def extract(self, url: str, last_url: str = None):
         try:
-            matched = re.compile(self._VALID_URL).match(url).group(*self._GROUPED_BY)
+            matched = re.compile(self._VALID_URL).match(
+                url).group(*self._GROUPED_BY)
         except AttributeError:
             logging.error((self._VALID_URL, url, 'does not match!'))
             raise
         if not self.url_valid(last_url):
             last_url = True
-        if type(matched) is str: matched = [matched]
+        if type(matched) is str:
+            matched = [matched]
         return self.extract_API(
             *matched,
             stop_after=last_url,
-            )
+        )
 
     def url_valid(self, *args, **kwargs):
         return True
+
 
 class InfoExtractor(Extractor):
     '''
     copied from ytdlp 
     '''
+
     def extract_API(
             self,
             *args,
             stop_after: str = None,
-            time_wait = 0.5,
+            time_wait=0.5,
             headers: dict = {
-                'user-agent':'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '\
-                    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5060.134 Mobile Safari/537.36',
+                'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5060.134 Mobile Safari/537.36',
             }) -> list:
         r = []
         for i in range(999):
-            logging.debug(['extract API', self._API.format(*args, page=str(i + 1))])
-            k = requests.get(self._API.format(*args, page=str(i + 1)), headers=headers)
-            parsed, return_signal = self.parse_json(json_obj=k, stop_after=stop_after)
+            logging.debug(
+                ['extract API', self._API.format(*args, page=str(i + 1))])
+            k = requests.get(self._API.format(
+                *args, page=str(i + 1)), headers=headers)
+            parsed, return_signal = self.parse_json(
+                json_obj=k, stop_after=stop_after)
             r += parsed
             if return_signal:
                 return r
@@ -142,18 +152,22 @@ class InfoExtractor(Extractor):
     def parse_json(self, json_obj, **kwargs):
         raise Exception()
 
+
 class BiliInfoExtractor(InfoExtractor):
 
     def url_valid(self, stop_after):
         try:
-            bvid = re.compile(r'https?://www.bilibili\.com/video/(?P<bvid>BV.+)\?*.*').match(str(stop_after)).group('bvid')  
+            bvid = re.compile(
+                r'https?://www.bilibili\.com/video/(?P<bvid>BV.+)\?*.*').match(str(stop_after)).group('bvid')
             logging.debug(['extracted bvid', bvid, 'from', stop_after])
             if -404 == requests.get(f'https://api.bilibili.com/x/player/pagelist?bvid={bvid}&jsonp=jsonp').json()['code']:
-                logging.warning(f'{bvid} is not a valid URL; setting extractor to prime to the most recent URL.')
+                logging.warning(
+                    f'{bvid} is not a valid URL; setting extractor to prime to the most recent URL.')
                 return False
             return True
         except AttributeError:
             return True
+
 
 class BilibiliChannelSeriesIE(BiliInfoExtractor):
     # https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0
@@ -173,7 +187,7 @@ class BilibiliChannelSeriesIE(BiliInfoExtractor):
                 return r, True
         return r, len(r) == 0
 
-        
+
 class BilibiliEpisodesIE(BiliInfoExtractor):
     # https://www.bilibili.com/video/BV1zP411V7ap
     _VALID_URL = r'https?://www.bilibili\.com/video/(?P<bvid>BV.+)\?*.*'
@@ -184,14 +198,15 @@ class BilibiliEpisodesIE(BiliInfoExtractor):
             self,
             *args,
             stop_after: str = None,
-            time_wait = 0.5) -> list:
+            time_wait=0.5) -> list:
         r = []
         k = requests.get(self._API.format(*args))
         try:
             parsed, return_signal = self.parse_json(
                 json_obj=k, stop_after=stop_after, bvid=args[0])
         except:
-            logging.error([self._API.format(*args), 'extractor parsing JSON failed'])
+            logging.error([self._API.format(*args),
+                          'extractor parsing JSON failed'])
             raise
         r += parsed
         if return_signal:
@@ -199,13 +214,12 @@ class BilibiliEpisodesIE(BiliInfoExtractor):
         time.sleep(time_wait)
         return r
 
-
     def parse_json(self, json_obj: dict, bvid: str, stop_after: bool = None) -> tuple:
         r = []
         for i in reversed(json_obj.json()['data']):
             if r'https://www.bilibili.com/video/{}?p={}'.format(
-                bvid,
-                i['page']) == stop_after:
+                    bvid,
+                    i['page']) == stop_after:
                 return r, True
             r.append(
                 [i['part'], r'https://www.bilibili.com/video/{}?p={}'.format(bvid, i['page'])])
@@ -219,9 +233,11 @@ class BilibiliChannelCollectionsIE(BiliInfoExtractor):
     _GROUPED_BY = ['userid', 'listid']
     _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30'
 
+
 class BilibiliChannelIE(BiliInfoExtractor):
-    
-    _VALID_URL = 'https:\/\/space\.bilibili\.com\/(?P<userid>\d+)'#r'https?://space.bilibili\.com/(?P<userid>\d+)/'
+
+    # r'https?://space.bilibili\.com/(?P<userid>\d+)/'
+    _VALID_URL = 'https:\/\/space\.bilibili\.com\/(?P<userid>\d+)'
     _GROUPED_BY = ['userid']
     _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50'
 
@@ -229,10 +245,9 @@ class BilibiliChannelIE(BiliInfoExtractor):
             self,
             *args,
             stop_after: str = None,
-            time_wait = 10,
+            time_wait=10,
             headers: dict = {
-                'user-agent':'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '\
-                    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5060.134 Mobile Safari/537.36',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
             }) -> list:
         r = []
         for i in range(999):
@@ -245,7 +260,8 @@ class BilibiliChannelIE(BiliInfoExtractor):
             newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{get_query(qs2)}'
             print(['extract API', newapiurl])
             k = requests.get(newapiurl, headers=headers)
-            parsed, return_signal = self.parse_json(json_obj=k, stop_after=stop_after)
+            parsed, return_signal = self.parse_json(
+                json_obj=k, stop_after=stop_after)
             r += parsed
             if return_signal:
                 return r
@@ -278,6 +294,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
                 )
             raise
 
+
 class localGlob(Extractor):
     '''
     '''
@@ -287,11 +304,12 @@ class localGlob(Extractor):
     def extract_API(
             self,
             *args,
-            stop_after: str=None,
+            stop_after: str = None,
             time_wait=0.5) -> list:
         return [['', x] for x in glob.glob(args[0])]
 
-def url_filter(r: list, or_keywords:list = [], no_keywords:list = []) -> list:
+
+def url_filter(r: list, or_keywords: list = [], no_keywords: list = []) -> list:
     '''
     keep item in r if item has one of the or keywords
     '''
@@ -301,10 +319,11 @@ def url_filter(r: list, or_keywords:list = [], no_keywords:list = []) -> list:
         if len(or_keywords) > 0 and not (True in [x in i[0] for x in or_keywords]):
             continue
         # if selecting by not including a keyword; if that word does appera, skip
-        if  (True in [x in i[0] for x in no_keywords]):
+        if (True in [x in i[0] for x in no_keywords]):
             continue
         r2.append(i[1])
     return r2
+
 
 EXTRACTORS = {
     'biliseries': BilibiliChannelSeriesIE,
@@ -316,8 +335,8 @@ EXTRACTORS = {
 
 FILTERS = {
     None: lambda r: [x[1] for x in r],
-    'karaoke': lambda r: url_filter(r, or_keywords=['歌','唱','黑听']),
-    'moonlight': lambda r: url_filter(r, or_keywords=['歌','唱','黑听','猫猫头播放器']),
+    'karaoke': lambda r: url_filter(r, or_keywords=['歌', '唱', '黑听']),
+    'moonlight': lambda r: url_filter(r, or_keywords=['歌', '唱', '黑听', '猫猫头播放器']),
     'nopart': lambda r: url_filter(r, no_keywords=['part',]),
     'nogame': lambda r: url_filter(r, no_keywords=['游戏',]),
     'song_from_stream': lambda r: url_filter(r, or_keywords=['歌切',]),
@@ -325,5 +344,5 @@ FILTERS = {
 }
 
 
-def extract_wrapper(url, extractor = EXTRACTORS['biliepisode'](), filter = FILTERS[None]):
+def extract_wrapper(url, extractor=EXTRACTORS['biliepisode'](), filter=FILTERS[None]):
     return filter(extractor.extract(url))
