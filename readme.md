@@ -17,11 +17,11 @@ sudo swapon /swapfile
 free -h
 ```
 
-NOTE: you may or may not need sudo to perform docker commands.
+注意：您可能需要也可能不需要 sudo 来执行 docker 命令。
 
-NOTE: all docker commands below contains the user name and group id. these are mapped to 1001:1001 as they are the defaults for oracle servers. If you cannot locate this information, simply remove them and run the docker container under root. 
+注意：下面的所有 docker 命令都包含用户名和组 ID。 这些映射到 1001:1001，因为它们是 Oracle 服务器的默认值。 如果您找不到此信息，只需删除它们并在 root 下运行 docker 容器即可。
 
-NOTE: for windows servers, run `${pwd}` instead of `"$(pwd)"`
+注意：对于 Windows 服务器，运行 `${pwd}` 而不是 `"$(pwd)"`
 
 3. git clone repo
 ```
@@ -35,7 +35,7 @@ sudo docker build .
 ```
 OR:
 
-3b. pull a premade docker镜像
+3b. 拉一个预制的 docker 镜像
 
 https://hub.docker.com/repository/docker/gaoshi/ipynb-inaseg/tags?page=1&ordering=last_updated
 
@@ -92,40 +92,39 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 
 `sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=12800`
 
-7. Extras
+7. 附加功能
 
-Q: better system? more RAM?
+问：更好的系统？ 更多内存？
 
-change batch_size: `segment_wrapper(media: str, batch_size: int = 32` in `inaseg.py` from `32` to something large like `128` or `512`; a larger batch may have 100% performance increase.
+将 `inaseg.py` 中的 batch_size: `segment_wrapper(media: str, batch_size: int = 32` 从 `32` 更改为较大的值，如 `128` 或 `512`；较大的批次可能会带来 100% 的性能提升。
 
-change media sliding window size: `SEGMENT_THRES = 600` in `inaseg.py` to something large; this is the largest media chunk to be processed in seconds. a larger chunk will save disk read.
+将媒体滑动窗口大小：“inaseg.py”中的“SEGMENT_THRES = 600”更改为较大的值； 这是在几秒内要处理的最大媒体块。 更大的块将节省磁盘读取。
 
-Q: has CUDA?
+问：有CUDA吗？
 
-pull this image instead:
+改为拉取此图像：
 
-```
+````
 sudo docker pull gaoshi/ipynb-inaseg:nightly-gpu
 sudo docker tag gaoshi/ipynb-inaseg:nightly-gpu ipynb-inaseg
-```
+````
 
-when running docker, add `--gpus all`.
+运行 docker 时，添加 `--gpus all`。
 
-to check if GPU is enabled, run:
+要检查 GPU 是否已启用，请运行：
 
-```
+````
 sudo docker run -v "$(pwd)":/inaseg -it --rm ipynb-inaseg
 python3
 import tensorflow as tf
 print(tf.config.list_physical_devices('GPU'))
-```
+````
 
-note that your computer's CUDA version might need to be larger than the CUDA version in docker. 
+请注意，计算机的 CUDA 版本可能需要大于 docker 中的 CUDA 版本 (11.3?)。
 
-Q: speed tests
+问：速度测试
 
-inaseg for an 1 hour media file: 
-
+inaseg 获取 1 小时的媒体文件：
 Oracle E2.micro(1C2T): ~1hr
 
 AMD Ryzen 3700X(8C16T): ~2min?
