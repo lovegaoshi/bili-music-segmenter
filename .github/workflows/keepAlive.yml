@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: docker pull
-      - run: docker pull gaoshi/ipynb-inaseg:nightly
+        run: docker pull gaoshi/ipynb-inaseg:nightly
   docker-gpu:
     runs-on: ubuntu-latest
     steps:
       - name: docker pull
-      - run: docker pull gaoshi/ipynb-inaseg:nightly-gpu
+        run: docker pull gaoshi/ipynb-inaseg:nightly-gpu
