@@ -31,7 +31,7 @@ cd ipynb
 
 3a. 安装docker镜像
 ```
-sudo docker build .
+sudo docker build -t ipynb-inaseg .
 ```
 OR:
 
