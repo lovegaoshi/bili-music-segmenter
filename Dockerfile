@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:nightly
+FROM tensorflow/tensorflow:2.13.0
 COPY . /inaseg
 WORKDIR /inaseg
 RUN pip install -r /inaseg/requirements.txt
