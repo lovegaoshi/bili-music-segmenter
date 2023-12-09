@@ -92,7 +92,11 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 
 `sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/BiliWatcher.py --watch_interval=12800`
 
-7. 附加功能
+# WINDOWS 
+
+windows下也推荐用docker：https://github.com/lovegaoshi/ipynb/issues/9
+
+# 附加功能
 
 问：更好的系统？ 更多内存？
 
