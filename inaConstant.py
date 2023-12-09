@@ -9,7 +9,9 @@ import logging
 import json
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+
 from wbi import get_query
+from constants import DEFAULT_UI
 
 '''
 from inaConstant import EXTRACTORS
@@ -131,10 +133,7 @@ class InfoExtractor(Extractor):
             *args,
             stop_after: str = None,
             time_wait=0.5,
-            headers: dict = {
-                'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '
-                'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5060.134 Mobile Safari/537.36',
-            }) -> list:
+            headers: dict = DEFAULT_UI) -> list:
         r = []
         for i in range(999):
             logging.debug(
@@ -246,9 +245,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
             *args,
             stop_after: str = None,
             time_wait=10,
-            headers: dict = {
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
-            }) -> list:
+            headers: dict = DEFAULT_UI) -> list:
         r = []
         for i in range(999):
             apiurl = self._API.format(*args, page=str(i + 1))

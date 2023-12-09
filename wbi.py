@@ -4,6 +4,8 @@ import urllib.parse
 import time
 import requests
 
+from constants import DEFAULT_UI
+
 mixinKeyEncTab = [
     46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
     33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
@@ -11,9 +13,11 @@ mixinKeyEncTab = [
     36, 20, 34, 44, 52
 ]
 
+
 def getMixinKey(orig: str):
     '对 imgKey 和 subKey 进行字符顺序打乱编码'
     return reduce(lambda s, i: s + orig[i], mixinKeyEncTab, '')[:32]
+
 
 def encWbi(params: dict, img_key: str, sub_key: str):
     '为请求参数进行 wbi 签名'
@@ -23,8 +27,8 @@ def encWbi(params: dict, img_key: str, sub_key: str):
     params = dict(sorted(params.items()))                       # 按照 key 重排参数
     # 过滤 value 中的 "!'()*" 字符
     params = {
-        k : ''.join(filter(lambda chr: chr not in "!'()*", str(v)))
-        for k, v 
+        k: ''.join(filter(lambda chr: chr not in "!'()*", str(v)))
+        for k, v
         in params.items()
     }
     query = urllib.parse.urlencode(params)                      # 序列化参数
@@ -32,9 +36,11 @@ def encWbi(params: dict, img_key: str, sub_key: str):
     params['w_rid'] = wbi_sign
     return params
 
-def getWbiKeys(): # -> tuple[str, str]
+
+def getWbiKeys():  # -> tuple[str, str]
     '获取最新的 img_key 和 sub_key'
-    resp = requests.get('https://api.bilibili.com/x/web-interface/nav')
+    resp = requests.get(
+        'https://api.bilibili.com/x/web-interface/nav', headers=DEFAULT_UI)
     resp.raise_for_status()
     json_content = resp.json()
     img_url: str = json_content['data']['wbi_img']['img_url']
@@ -43,9 +49,11 @@ def getWbiKeys(): # -> tuple[str, str]
     sub_key = sub_url.rsplit('/', 1)[1].split('.')[0]
     return img_key, sub_key
 
-def get_query(params): 
+
+def get_query(params):
     img_key, sub_key = getWbiKeys()
     return urllib.parse.urlencode(encWbi(params, img_key, sub_key))
+
 
 if __name__ == "__main__":
     img_key, sub_key = getWbiKeys()
