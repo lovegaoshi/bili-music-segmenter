@@ -12,6 +12,7 @@ from urllib.parse import parse_qs
 
 from wbi import get_query
 from constants import DEFAULT_UI
+from cookieformatter import biliup_to_string
 
 '''
 from inaConstant import EXTRACTORS
@@ -245,8 +246,10 @@ class BilibiliChannelIE(BiliInfoExtractor):
             *args,
             stop_after: str = None,
             time_wait=10,
-            headers: dict = DEFAULT_UI) -> list:
+            headers: dict = 0) -> list:
         r = []
+        if headers == 0:
+            headers = { **DEFAULT_UI, 'cookie': biliup_to_string()}
         for i in range(999):
             apiurl = self._API.format(*args, page=str(i + 1))
             parsed_url = urlparse(apiurl)
