@@ -32,7 +32,8 @@ def retry(times: int, timeout: int, exceptions: tuple):
                         '%d of %d' % (func, attempt + 1, times)
                     )
                     attempt += 1
-                    if attempt == times: raise MaxRetryReached()
+                    if attempt == times:
+                        raise MaxRetryReached()
                     time.sleep(timeout)
             return func(*args, **kwargs)
         return newfn

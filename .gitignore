@@ -9,3 +9,6 @@ inaupload
 
 *.sqlite
 *.log
+ytdlp_cookies.txt
+save.yaml
+*.old
