@@ -81,10 +81,11 @@ def save_config(config_dir: str, default: dict = {}) -> None:
 def bkup_config(config_dir: str, encoding: str = 'utf-8', backup_day: int = 7) -> None:
     try:
         c = yaml.safe_load(open(config_dir, 'r', encoding=encoding))
-        if not 'created-time' in c:
+        if 'created-time' not in c:
             c['created-time'] = datetime.now().strftime(r'%Y-%m-%d')
             save_config(config_dir, c)
-        elif (datetime.now() - datetime.strptime(c['created-time'], '%Y-%m-%d')).days > backup_day:
+        elif (datetime.now() - 
+            datetime.strptime(c['created-time'], '%Y-%m-%d')).days > backup_day:
             os.makedirs('backup', exist_ok=True)
             save_config(
                 f"{os.path.splitext(config_dir)[0]}_{c['created-time']}.{os.path.splitext(config_dir)[1]}",
@@ -92,7 +93,7 @@ def bkup_config(config_dir: str, encoding: str = 'utf-8', backup_day: int = 7) -
             )
             os.remove(config_dir)
             os.remove(config_dir + '.old')
-    except:
+    except Exception:
         pass
 
 
@@ -160,9 +161,10 @@ class BiliInfoExtractor(InfoExtractor):
             bvid = re.compile(
                 r'https?://www.bilibili\.com/video/(?P<bvid>BV.+)\?*.*').match(str(stop_after)).group('bvid')
             logging.debug(['extracted bvid', bvid, 'from', stop_after])
-            if -404 == requests.get(f'https://api.bilibili.com/x/player/pagelist?bvid={bvid}&jsonp=jsonp').json()['code']:
+            if -404 == requests.get(f'https://api.bilibili.com/x/player/pagelist?bvid={bvid}&jsonp=jsonp').json()['code']:  # noqa: E501
                 logging.warning(
-                    f'{bvid} is not a valid URL; setting extractor to prime to the most recent URL.')
+                    f'{bvid} is not a valid URL; setting extractor to \
+                        prime to the most recent URL.')
                 return False
             return True
         except AttributeError:
@@ -171,9 +173,9 @@ class BiliInfoExtractor(InfoExtractor):
 
 class BilibiliChannelSeriesIE(BiliInfoExtractor):
     # https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0
-    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/seriesdetail.+sid=(?P<listid>\d+)'
+    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/seriesdetail.+sid=(?P<listid>\d+)'  # noqa: E501
     _GROUPED_BY = ['userid', 'listid']
-    _API = r'https://api.bilibili.com/x/series/archives?mid={}&series_id={}&only_normal=true&sort=desc&pn={page}&ps=30'
+    _API = r'https://api.bilibili.com/x/series/archives?mid={}&series_id={}&only_normal=true&sort=desc&pn={page}&ps=30' # noqa: E501
 
     def parse_json(self, json_obj: dict, stop_after: bool = None) -> tuple:
         r = []
@@ -222,16 +224,16 @@ class BilibiliEpisodesIE(BiliInfoExtractor):
                     i['page']) == stop_after:
                 return r, True
             r.append(
-                [i['part'], r'https://www.bilibili.com/video/{}?p={}'.format(bvid, i['page'])])
+                [i['part'], r'https://www.bilibili.com/video/{}?p={}'.format(bvid, i['page'])]) # noqa: E501
             if stop_after is True:
                 return r, True
         return r, len(r) == 0
 
 
 class BilibiliChannelCollectionsIE(BiliInfoExtractor):
-    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/collectiondetail.+sid=(?P<listid>\d+)'
+    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/collectiondetail.+sid=(?P<listid>\d+)' # noqa: E501
     _GROUPED_BY = ['userid', 'listid']
-    _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30'
+    _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30' # noqa: E501
 
 
 class BilibiliChannelIE(BiliInfoExtractor):
@@ -239,7 +241,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
     # r'https?://space.bilibili\.com/(?P<userid>\d+)/'
     _VALID_URL = 'https:\/\/space\.bilibili\.com\/(?P<userid>\d+)'
     _GROUPED_BY = ['userid']
-    _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50'
+    _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50' # noqa: E501
 
     def extract_API(
             self,
@@ -257,7 +259,8 @@ class BilibiliChannelIE(BiliInfoExtractor):
             print(parse_qs(parsed_url.query))
             qs = parse_qs(parsed_url.query)
             qs2 = {key: qs[key][0] for key in qs}
-            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{get_query(qs2)}'
+            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}\
+                {parsed_url.path}?{get_query(qs2)}'
             print(['extract API', newapiurl])
             k = requests.get(newapiurl, headers=headers)
             parsed, return_signal = self.parse_json(
@@ -280,7 +283,9 @@ class BilibiliChannelIE(BiliInfoExtractor):
                         i['bvid']) == stop_after:
                     return r, True
                 r.append(
-                    [i['title'], r'https://www.bilibili.com/video/{}'.format(i['bvid'])])
+                    [
+                        i['title'],
+                        r'https://www.bilibili.com/video/{}'.format(i['bvid'])])
                 if stop_after is True:
                     return r, True
             return r, len(r) == 0
@@ -316,7 +321,7 @@ def url_filter(r: list, or_keywords: list = [], no_keywords: list = []) -> list:
     r2 = []
     for i in r:
         # if selecting by containing a keyword: then if that word doesnt appear, skip
-        if len(or_keywords) > 0 and not (True in [x in i[0] for x in or_keywords]):
+        if len(or_keywords) > 0 and True not in [x in i[0] for x in or_keywords]:
             continue
         # if selecting by not including a keyword; if that word does appera, skip
         if (True in [x in i[0] for x in no_keywords]):

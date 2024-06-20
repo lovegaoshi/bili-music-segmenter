@@ -2,7 +2,8 @@ import subprocess
 import tarfile
 import glob
 import os
-subprocess.call(r'curl -s https://api.github.com/repositories/437055168/releases/latest \
+subprocess.call(
+    r'curl -s https://api.github.com/repositories/437055168/releases/latest \
 | grep "browser_download_url.*x86_64-linux\.tar\.xz" \
 | cut -d : -f 2,3 | tr -d \"  | wget -qi -', shell=True)
 biliup_tar_path = glob.glob('biliupR*')[0]
