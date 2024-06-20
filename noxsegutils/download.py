@@ -12,7 +12,7 @@ COOKIES_LOCATION = ['--cookies', 'ytdlp_cookies.txt']
 def ytbdl(
     url: str, soundonly: str = '-f bestaudio',
     outdir: str = tempfile.gettempdir(),
-    aria: int = None) -> list:
+    aria: int = None) -> str:
     r = ''# --restrict-filenames
     fname = None
     #./youtube-dl

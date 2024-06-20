@@ -11,7 +11,7 @@ from noxsegutils.shazam import shazaming
 from noxsegutils.util import get_segment_process_length_array, ffmpeg
 from noxsegutils.timestamp import fix_missing_stamps, sec2timestamp
 from noxsegutils.download import ytbdl
-from inaConstant import load_config, save_config
+from noxsegutils.extractor import load_config, save_config
 
 # 媒体流最大时长处理（秒）；1G内存的进程推荐用10分钟/600秒，16G可以支持5小时，6GB VRAM可以支持5小时左右。
 SEGMENT_THRES = 800
@@ -37,7 +37,7 @@ class TimestampMismatch(Exception):
 # select a media to analyse
 # any media supported by ffmpeg may be used (video, audio, urls)
 def segment(
-    media, batch_size = BATCH_SIZE, energy_ratio = ENERGY_RATIO,
+    media: str, batch_size: int = BATCH_SIZE, energy_ratio: float = ENERGY_RATIO,
     start_sec: int = None, stop_sec: int = None):
     segmenter = Segmenter(
         vad_engine='sm',
@@ -50,7 +50,7 @@ def segment(
 
 def segment_wrapper(
     media: str, batch_size: int = BATCH_SIZE,
-    energy_ratio: float = ENERGY_RATIO, segment_length_thres:int = 0):
+    energy_ratio: float = ENERGY_RATIO, segment_length_thres: int = 0):
     ''''''
     result = []
     for i in get_segment_process_length_array(media, segment_length_thres):

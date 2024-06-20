@@ -5,10 +5,12 @@ import json
 import os
 from inaseg import shazaming
 import subprocess
-from cookieformatter import biliup_to_ytbdl_cookie_write2file
-from inaConstant import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 import multiprocessing
+from datetime import datetime
+
+from cookieformatter import biliup_to_ytbdl_cookie_write2file
 from inacelery import add
+from noxsegutils.extractor import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 from noxsegutils.download import ytbdl
 from noxsegutils.filename import  strip_medianame_out, put_medianame_backin
 
@@ -29,7 +31,8 @@ def cell_stdout(cmd, silent=False, encoding=None):
                     logging.debug(i)
             except UnicodeDecodeError:
                 # 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
-                logging.warning('decode failed! but at least you have this eror message...')
+                logging.warning('decode failed! \
+                    but at least you have this eror message...')
         p.wait()
     return p.returncode
 
@@ -69,11 +72,9 @@ def bilibili_upload(
         tags = [ripped_from]
     title = media_basename[:media_basename.rfind('.')][:60]
     # title rework: [歌切][海德薇Hedvika] 20220608的直播歌曲
-    title = '[{}] {}的直播歌曲'.format(tags[0], os.path.splitext(media_basename)[0][-8:])
-
-    #title = '[{}] {}'.format(tags[0], os.path.splitext(media_basename)[0].replace(ripped_from, '')[-8:])
-    
-    title = media_basename[:media_basename.rfind('.')][:60].replace(ripped_from, tags[0]).replace('【直播回放】','')
+    title = '[{}] {}的直播歌曲'.format(tags[0], os.path.splitext(media_basename)[0][-8:])    
+    title = media_basename[:media_basename.rfind('.')][:60].replace(
+        ripped_from, tags[0]).replace('【直播回放】','')
     globbed = sorted(globbed)
     globbed_episode_limit = []
     for i in range(len(globbed) // episode_limit + 1):
@@ -92,7 +93,8 @@ def bilibili_upload(
                 'biliup',
                 'upload',
             ]
-        for x in globbed_episode_limit[i]: cmd.append(x)
+        for x in globbed_episode_limit[i]:
+            cmd.append(x)
         cmd.append('--copyright=2')
         cmd.append('--desc={}'.format(description))
         cmd.append('--tid=31')
@@ -110,15 +112,19 @@ def bilibili_upload(
             )
             os.mkdir(relocated_dir_on_fail)
             for item in globbed_episode_limit[i]:
-                os.rename(item, os.path.join(relocated_dir_on_fail, os.path.basename(item)))
+                os.rename(
+                    item,
+                    os.path.join(relocated_dir_on_fail, os.path.basename(item)))
 
             for index, item in enumerate(globbed_episode_limit[i]):
-                globbed_episode_limit[i][index] = os.path.join(relocated_dir_on_fail, os.path.basename(item))
+                globbed_episode_limit[i][index] = os.path.join(
+                    relocated_dir_on_fail, os.path.basename(item))
             cmd = [
                     'biliup',
                     'upload',
                 ]
-            for x in globbed_episode_limit[i]: cmd.append(x)
+            for x in globbed_episode_limit[i]:
+                cmd.append(x)
             cmd.append('--copyright=2')
             cmd.append('--desc={}'.format(description))
             cmd.append('--tid=31')
@@ -145,8 +151,10 @@ def bilibili_upload(
                 relocated_dir_on_fail = f'{title.replace(" ", "_")}'
                 os.mkdir(relocated_dir_on_fail)
                 for item in globbed_episode_limit[i]:
-                    os.rename(item, os.path.join(relocated_dir_on_fail, os.path.basename(item)))
-                logging.warning(f'max retry of {retry} reached. files have been moved to {relocated_dir_on_fail}.')
+                    os.rename(item, os.path.join(
+                        relocated_dir_on_fail, os.path.basename(item)))
+                logging.warning(f'max retry of {retry} reached. \
+                    files have been moved to {relocated_dir_on_fail}.')
                 raise Exception(
                     'biliup failed for a total of {} times'.format(
                         str(retry)))
@@ -185,8 +193,10 @@ class InaBiliup():
 
             media = self.media
             outdir = self.outdir
-            if media == '': return
-            logging.info(f'inaseging {media} at ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            if media == '':
+                return
+            logging.info(f'inaseging {media} at ' + \
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             os.chdir(outdir)
             if 'https:' in media: 
             # use biliup to renew the cookie file, and write to ytdlp netscape format.
@@ -207,35 +217,46 @@ class InaBiliup():
             shazaming(outdir, media, threads = self.shazam_thread)
             stripped_media_names = strip_medianame_out(outdir, media)
             logging.info(['preparing to upload', stripped_media_names])
-            bilibili_upload(stripped_media_names, os.path.basename(media), source=None, episode_limit=self.episode_limit)
+            bilibili_upload(
+                stripped_media_names, os.path.basename(media),
+                source=None, episode_limit=self.episode_limit)
             logging.info(['finished stripping and uploading', media])
             if self.cleanup:
-                if os.path.isfile(media): os.remove(media)
-                for i in stripped_media_names: os.remove(i)
-            else: put_medianame_backin(stripped_media_names, media, shazamed=r'D:\tmp\ytd\convert2music', nonshazamed=r'D:\tmp\ytd\extract')
+                if os.path.isfile(media):
+                    os.remove(media)
+                for i in stripped_media_names:
+                    os.remove(i)
+            else:
+                put_medianame_backin(
+                    stripped_media_names, media, 
+                    hazamed=r'D:\tmp\ytd\convert2music',
+                    nonshazamed=r'D:\tmp\ytd\extract')
         except KeyboardInterrupt:
             raise
         except BaseException:
             if self.ignore_errors:
-                for i in glob.glob('*.mp4') + glob.glob('*.aria2') + glob.glob('*.part'): os.remove(i)
+                for i in glob.glob('*.mp4') + glob.glob('*.aria2') + \
+                    glob.glob('*.part'):
+                    os.remove(i)
                 # if os.path.isfile(media): os.remove(media)
-                logging.error(f'{media} failed. file is removed in automatic error ignore handler')
+                logging.error(f'{media} failed. file is removed in\
+                     automatic error ignore handler')
             else:
                 raise
 
 outdir = '/inaseg' #os.getcwd()#r'D:\tmp\ytd\hedvika'
-import os
-import argparse
-from datetime import datetime
-parser = argparse.ArgumentParser(description='ina music segment')
-parser.add_argument('--media', type=str, nargs='+', help='file path or weblink')
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='ina music segment')
+    parser.add_argument('--media', type=str, nargs='+', help='file path or weblink')
     logging.basicConfig(level=logging.DEBUG, handlers=[
         logging.FileHandler('/inaseg/inaseg.log'),
         logging.StreamHandler()
     ])
     args = parser.parse_args()
     for media in args.media:
-        logging.info(f'inaseging {media} at ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        logging.info(
+            f'inaseging {media} at ' +
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         InaBiliup(media=media).run()
 

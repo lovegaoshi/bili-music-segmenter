@@ -1,7 +1,7 @@
 import time
 import os
-from inaConstant import WATCHER_CONFIG_DIR as CONFIG_DIREC
-from inaConstant import EXTRACTORS, FILTERS, load_config, save_config
+from noxsegutils.extractor import WATCHER_CONFIG_DIR as CONFIG_DIREC
+from noxsegutils.extractor import EXTRACTORS, FILTERS, load_config, save_config
 import logging
 from datetime import datetime
 
@@ -24,14 +24,14 @@ def watch(config_dir=CONFIG_DIREC):
     watch_list = load_config(config_dir, default=DEFAULT_CONFIG)
     os.replace(config_dir, config_dir + '.old', )
     for item in watch_list:
-        if not item['extractor'] in EXTRACTORS:
+        if item['extractor'] not in EXTRACTORS:
             continue
         extractor = EXTRACTORS[item['extractor']]()
         new_urls = extractor.extract(
             url=item['url'],
             last_url=item['last_url']
         )
-        if not item['last_url'] is True:
+        if item['last_url'] is not True:
             r += FILTERS[item['filter']](new_urls)
         if len(new_urls) > 0:
             item['last_url'] = new_urls[0][1]
@@ -62,16 +62,18 @@ if __name__ == '__main__':
         logging.StreamHandler()
     ])
     while True:
-        logging.info(['biliWatcher loop has started on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+        logging.info([
+            'biliWatcher loop has started on ',
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
         for i in reversed(watch()):
-            logging.info(['calling biliupWrapper on', i, 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+            logging.info([
+                'calling biliupWrapper on', i, 'at',
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
             InaBiliup(media=i).run()
-        logging.info(['biliWatcher loop has completed on ', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
-        if args.watch_interval < 1: sys.exit(0)
+        logging.info([
+            'biliWatcher loop has completed on ',
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+        if args.watch_interval < 1:
+            sys.exit(0)
         logging.debug(['biliWatcher loop is now waiting for ', args.watch_interval])
         time.sleep(args.watch_interval)
-        # p = subprocess.Popen(['python', 'biliupWrapper.py', '--media='+i])
-        # p.wait()
-    #url = r'https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0'
-    #extractor = EXTRACTORS['biliseries']()
-    #print(my_url_filter(extractor.extract_API(*re.compile(extractor._VALID_URL).match(url).group(*extractor._GROUPED_BY), stop_after = None)))

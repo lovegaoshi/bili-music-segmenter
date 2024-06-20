@@ -8,7 +8,7 @@ from functools import partial
 from ShazamAPI import Shazam
 import requests
 
-from inaConstant import load_config, save_config
+from noxsegutils.extractor import load_config, save_config
 
 SAVE_YAML_PATH = os.path.join(
     os.path.dirname(
