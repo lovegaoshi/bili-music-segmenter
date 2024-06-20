@@ -6,6 +6,11 @@ EXTRACT_SEG_THRES = 60
 EXTRACT_SEG_THRES_FINAL = 80
 # 识歌分段连接的阈值（秒），调大了会两首歌分不开 调小了会碎
 EXTRACT_SEG_CONNECT = 5
+# 大了会碎 小了会两首歌分不开
+ENERGY_RATIO = 0.03
+# 8GB VRAM 推荐 256
+BATCH_SIZE = 32
+
 COOKIES_LOCATION = ['--cookies', 'ytdlp_cookies.txt']
 
 # Load the API
@@ -35,7 +40,7 @@ class TimestampMismatch(Exception):
 # any media supported by ffmpeg may be used (video, audio, urls)
 import json, shutil
 
-def segment(media, batch_size=64, energy_ratio=0.02, start_sec: int = None, stop_sec: int = None):
+def segment(media, batch_size = BATCH_SIZE, energy_ratio = ENERGY_RATIO, start_sec: int = None, stop_sec: int = None):
     segmenter = Segmenter(
         vad_engine='sm',
         detect_gender=False,
@@ -45,7 +50,7 @@ def segment(media, batch_size=64, energy_ratio=0.02, start_sec: int = None, stop
     return segmentation
 
 
-def segment_wrapper(media: str, batch_size: int = 32, energy_ratio: float = 0.03, segment_length_thres:int = 0):
+def segment_wrapper(media: str, batch_size: int = BATCH_SIZE, energy_ratio: float = ENERGY_RATIO, segment_length_thres:int = 0):
     ''''''
     result = []
     for i in get_segment_process_length_array(media, segment_length_thres):
