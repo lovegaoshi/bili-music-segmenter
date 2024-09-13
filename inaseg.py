@@ -6,6 +6,7 @@ from threading import Thread
 import gc
 import logging
 import tempfile
+import asyncio
 
 from noxsegutils.shazam import shazaming
 from noxsegutils.util import get_segment_process_length_array, ffmpeg
@@ -208,6 +209,7 @@ def extract_mah_stuff(
     k = [Thread(target=ffmpeg, args=(x,)) for x in cmds]
     for i in k: 
         i.start()
+    for i in k: 
         i.join()
     #k[-1].join()
 
@@ -265,30 +267,14 @@ if __name__ == '__main__':
         media = ytbdl(
             media, soundonly = args.soundonly,
             aria = args.aria, outdir = args.outdir)
-    #media = r"D:\tmp\ytd\[莉犬くん【すとぷり】] 【激レア歌枠】とんでもないお知らせがあります。。。【莉犬】 20220607.webm"
     if len(glob.glob(os.path.join(
         args.outdir, f'*{os.path.splitext(os.path.basename(media))[0][1:]}_*'))) == 0:
         import tensorflow as tf
         gpus = tf.config.experimental.list_physical_devices('GPU')
         logging.info(gpus)
         tf.get_logger().setLevel(logging.WARNING)
-        if False and gpus:
-        # Restrict TensorFlow to only allocate 1GB of memory on the first GPU: noope.
-            try:
-                tf.config.experimental.set_virtual_device_configuration(
-                    gpus[0],
-                    [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=5424)])
-                logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-                logging.info([len(gpus), "Physical GPUs,",
-                len(logical_gpus), "Logical GPUs"])
-                os.environ["TF_GPU_ALLOCATOR"]="cuda_malloc_async"
-            except RuntimeError as e:
-                # Virtual devices must be set before GPUs have been initialized
-                logging.error(e)
-                raise 
         try:
             timestamps = []
-            #timestamps = mus1ca_timestamp(media[:media.rfind('.')] + '.description')
             saved_timestamp = extract_music(segment_wrapper(
                 media, segment_length_thres=args.max_segment_length),
                 segment_connect = args.seg_connect)
@@ -306,9 +292,12 @@ if __name__ == '__main__':
     logging.info(['segmentation', media, 'successful'])
     if args.cleanup and os.path.isfile(media):
         os.remove(media)
-    if args.shazam: 
-        shazaming(
-            args.outdir, media, args.shazam_coverart,
-            threads = args.shazam_multithread)
+    if args.shazam:
+        async def myshazam():
+            await shazaming(
+                args.outdir, media, args.shazam_coverart,)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myshazam())
+        loop.close()
     import sys
     sys.exit(0)

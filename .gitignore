@@ -12,3 +12,6 @@ inaupload
 ytdlp_cookies.txt
 save.yaml
 *.old
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+Untitled.ipynb
+test.py

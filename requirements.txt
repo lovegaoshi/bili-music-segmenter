@@ -1,6 +1,6 @@
 yt-dlp
 inaspeechsegmenter
-shazamapi
+shazamio
 pyyaml
 filelock
 jupyter
