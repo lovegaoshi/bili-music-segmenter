@@ -3,16 +3,17 @@ import logging
 import glob
 import json
 import os
-from inaseg import shazaming
 import subprocess
 import multiprocessing
 from datetime import datetime
+import time
 
 from cookieformatter import biliup_to_ytbdl_cookie_write2file
 from inacelery import add
 from noxsegutils.extractor import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 from noxsegutils.download import ytbdl
 from noxsegutils.filename import strip_medianame_out, put_medianame_backin
+from noxsegutils.logging import save_timestamps
 
 DEFAULT_SETTINGS = {
     "biliup_routes": ['qn'],
@@ -85,7 +86,7 @@ def bilibili_upload(
         globbed_episode_limit.append(
             globbed[i * episode_limit: (i + 1) * episode_limit])
 
-    for i in range(len(globbed_episode_limit)):
+    for i, v in enumerate(globbed_episode_limit):
         if i > 0:
             episode_limit_prefix = '_' + chr(97 + i)
         else:
@@ -95,7 +96,7 @@ def bilibili_upload(
             'biliup',
             'upload',
         ]
-        for x in globbed_episode_limit[i]:
+        for x in v:
             cmd.append(x)
         cmd.append('--copyright=2')
         cmd.append('--desc={}'.format(description))
@@ -171,11 +172,11 @@ class InaBiliup():
     def __init__(
         self,
         media: str,
-        outdir: str = '/inaseg',
+        outdir: str = os.getcwd(),
         episode_limit: int = 180,
         shazam_thread: int = min(max(multiprocessing.cpu_count(), 1), 4),
         ignore_errors: bool = True,
-        sound_only: bool = False,
+        sound_only: str = '-f bestaudio',
         route: str = BILIUP_ROUTE,
         cleanup: bool = True,
         no_biliup: bool = False,
@@ -201,26 +202,29 @@ class InaBiliup():
             logging.info(f'inaseging {media} at ' +
                          datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             os.chdir(outdir)
+
+            media_url = ''
             if 'https:' in media:
+                media_url = media
                 # use biliup to renew the cookie file, and write to ytdlp netscape format.
                 subprocess.call(['biliup', 'renew'])
                 biliup_to_ytbdl_cookie_write2file()
                 # , outdir = outdir
-                media = ytbdl(media, soundonly='', aria=16)
+                media = ytbdl(media, soundonly=self.sound_only, aria=16)
             if not cell_stdout([
                 'python',
                 'inaseg.py',
                 '--media={}'.format(media),
                 '--outdir={}'.format(outdir),
-                '--soundonly', '',
+                '--soundonly', self.sound_only,
+                '--shazam',
                     '--cleanup']) == 0:
                 raise BaseException()
             # inaseg failed?
             logging.info(['inaseg completed on', media])
-            # shazam 4 thread seems to be fine not triggering a ban
-            shazaming(outdir, media)
             stripped_media_names = strip_medianame_out(outdir, media)
             logging.info(['preparing to upload', stripped_media_names])
+
             bilibili_upload(
                 stripped_media_names, os.path.basename(media),
                 source=None, episode_limit=self.episode_limit)
@@ -249,14 +253,13 @@ class InaBiliup():
                 raise
 
 
-outdir = '/inaseg'  # os.getcwd()#r'D:\tmp\ytd\hedvika'
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='ina music segment')
     parser.add_argument('--media', type=str, nargs='+',
                         help='file path or weblink')
     logging.basicConfig(level=logging.DEBUG, handlers=[
-        logging.FileHandler('/inaseg/inaseg.log'),
+        logging.FileHandler('./inaseg.log'),
         logging.StreamHandler()
     ])
     args = parser.parse_args()
