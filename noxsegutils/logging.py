@@ -15,3 +15,4 @@ def save_timestamps(mediab: str, key: object, val: object, config: str = SAVE_YA
         save[mediab] = {}
     save[mediab][key] = val
     save_config(config, save)
+    return save
