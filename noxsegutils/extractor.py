@@ -26,28 +26,28 @@ RAM_LIMIT = 15000
 DEFAULT_BILIUP_LINE = 'kodo'
 
 WATCHER_CONFIG_DIR = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))),
     'configs',
     'biliWatcher.yaml')
 DLWATCHER_CONFIG_DIR = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))),
     'configs',
     'biliDLWatcher.yaml')
 NOUPWATCHER_CONFIG_DIR = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))),
     'configs',
     'noupWatcher.yaml')
 WRAPPER_CONFIG_DIR = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))),
     'configs',
     'biliWrapper.json')
 INASEGED_DIR = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))),
     'inaseged.yaml')
 
 
@@ -84,8 +84,8 @@ def bkup_config(config_dir: str, encoding: str = 'utf-8', backup_day: int = 7) -
         if 'created-time' not in c:
             c['created-time'] = datetime.now().strftime(r'%Y-%m-%d')
             save_config(config_dir, c)
-        elif (datetime.now() - 
-            datetime.strptime(c['created-time'], '%Y-%m-%d')).days > backup_day:
+        elif (datetime.now() -
+              datetime.strptime(c['created-time'], '%Y-%m-%d')).days > backup_day:
             os.makedirs('backup', exist_ok=True)
             save_config(
                 f"{os.path.splitext(config_dir)[0]}_{c['created-time']}.{os.path.splitext(config_dir)[1]}",
@@ -161,7 +161,7 @@ class BiliInfoExtractor(InfoExtractor):
             bvid = re.compile(
                 r'https?://www.bilibili\.com/video/(?P<bvid>BV.+)\?*.*').match(str(stop_after)).group('bvid')
             logging.debug(['extracted bvid', bvid, 'from', stop_after])
-            if -404 == requests.get(f'https://api.bilibili.com/x/player/pagelist?bvid={bvid}&jsonp=jsonp').json()['code']:  # noqa: E501
+            if -404 == requests.get(f'https://api.bilibili.com/x/player/pagelist?bvid={bvid}&jsonp=jsonp', headers=DEFAULT_UI).json()['code']:  # noqa: E501
                 logging.warning(
                     f'{bvid} is not a valid URL; setting extractor to \
                         prime to the most recent URL.')
@@ -175,7 +175,7 @@ class BilibiliChannelSeriesIE(BiliInfoExtractor):
     # https://space.bilibili.com/592726738/channel/seriesdetail?sid=2357741&ctype=0
     _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/seriesdetail.+sid=(?P<listid>\d+)'  # noqa: E501
     _GROUPED_BY = ['userid', 'listid']
-    _API = r'https://api.bilibili.com/x/series/archives?mid={}&series_id={}&only_normal=true&sort=desc&pn={page}&ps=30' # noqa: E501
+    _API = r'https://api.bilibili.com/x/series/archives?mid={}&series_id={}&only_normal=true&sort=desc&pn={page}&ps=30'  # noqa: E501
 
     def parse_json(self, json_obj: dict, stop_after: bool = None) -> tuple:
         r = []
@@ -224,16 +224,16 @@ class BilibiliEpisodesIE(BiliInfoExtractor):
                     i['page']) == stop_after:
                 return r, True
             r.append(
-                [i['part'], r'https://www.bilibili.com/video/{}?p={}'.format(bvid, i['page'])]) # noqa: E501
+                [i['part'], r'https://www.bilibili.com/video/{}?p={}'.format(bvid, i['page'])])  # noqa: E501
             if stop_after is True:
                 return r, True
         return r, len(r) == 0
 
 
 class BilibiliChannelCollectionsIE(BiliInfoExtractor):
-    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/collectiondetail.+sid=(?P<listid>\d+)' # noqa: E501
+    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/collectiondetail.+sid=(?P<listid>\d+)'  # noqa: E501
     _GROUPED_BY = ['userid', 'listid']
-    _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30' # noqa: E501
+    _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30'  # noqa: E501
 
 
 class BilibiliChannelIE(BiliInfoExtractor):
@@ -241,7 +241,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
     # r'https?://space.bilibili\.com/(?P<userid>\d+)/'
     _VALID_URL = 'https:\/\/space\.bilibili\.com\/(?P<userid>\d+)'
     _GROUPED_BY = ['userid']
-    _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50' # noqa: E501
+    _API = r'https://api.bilibili.com/x/space/wbi/arc/search?mid={}&pn={page}&jsonp=jsonp&ps=50'  # noqa: E501
 
     def extract_API(
             self,
@@ -251,7 +251,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
             headers: dict = 0) -> list:
         r = []
         if headers == 0:
-            headers = { **DEFAULT_UI, 'cookie': biliup_to_string()}
+            headers = {**DEFAULT_UI, 'cookie': biliup_to_string()}
         for i in range(999):
             apiurl = self._API.format(*args, page=str(i + 1))
             parsed_url = urlparse(apiurl)
@@ -342,6 +342,7 @@ FILTERS = {
     None: lambda r: [x[1] for x in r],
     'karaoke': lambda r: url_filter(r, or_keywords=['歌', '唱', '黑听']),
     'moonlight': lambda r: url_filter(r, or_keywords=['歌', '唱', '黑听', '猫猫头播放器']),
+    "steria": lambda r: url_filter(r, or_keywords=["歌", "唱", "黑听", "早安"]),
     'nopart': lambda r: url_filter(r, no_keywords=['part',]),
     'nogame': lambda r: url_filter(r, no_keywords=['游戏',]),
     'song_from_stream': lambda r: url_filter(r, or_keywords=['歌切',]),
