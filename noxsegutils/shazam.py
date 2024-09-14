@@ -8,16 +8,11 @@ import requests
 import asyncio
 from shazamio import Shazam
 
-from noxsegutils.extractor import load_config, save_config
+from noxsegutils.logging import save_timestamps
 
 
 semaphore = asyncio.Semaphore(3)
 myshazam = Shazam()
-
-SAVE_YAML_PATH = os.path.join(
-    os.path.dirname(
-        os.path.abspath(__file__)),
-    'save.yaml')
 
 
 async def shazam_orig(file, **kwargs):
@@ -29,19 +24,22 @@ async def shazaming(
     outdir, media, shazam_coverart_path='',
     shazam_func=shazam_orig, ignore_fails=False
 ):
+    mediab = os.path.basename(media)
     files = glob.glob(os.path.join(
-        outdir, '*' + os.path.splitext(os.path.basename(media))[0][1:] + '_*'
+        outdir, '*' + os.path.splitext(mediab)[0][1:] + '_*'
     ))
     await asyncio.gather(*[shazam_threaded(
         file, shazam_coverart_path=shazam_coverart_path,
         shazam_func=shazam_func, ignore_fails=ignore_fails
     ) for file in files])
-    save = load_config(SAVE_YAML_PATH)
-    mediab = os.path.basename(media)
-    save[os.path.basename(media) + "shazam"] = glob.glob(os.path.join(
-        outdir, '*' + mediab[1:mediab.rfind('.')] + '*'
-    ))
-    save_config(SAVE_YAML_PATH, save)
+    save_timestamps(mediab=mediab,
+                    key='shazam', val=[
+                        os.path.basename(x)
+                        for x in glob.glob(
+                            os.path.join(
+                                outdir, f"*{mediab[1: mediab.rfind('.')]}*")
+                        )
+                    ])
 
 
 async def shazam_threaded(
