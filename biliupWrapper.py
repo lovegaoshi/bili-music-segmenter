@@ -6,14 +6,12 @@ import os
 import subprocess
 import multiprocessing
 from datetime import datetime
-import time
 
 from cookieformatter import biliup_to_ytbdl_cookie_write2file
 from inacelery import add
 from noxsegutils.extractor import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 from noxsegutils.download import ytbdl
 from noxsegutils.filename import strip_medianame_out, put_medianame_backin
-from noxsegutils.logging import save_timestamps
 
 DEFAULT_SETTINGS = {
     "biliup_routes": ['qn'],
@@ -63,9 +61,7 @@ def bilibili_upload(
         try:
             description = keystamps[ripped_from][1]
         except IndexError:
-            description = '关注{}：{}'.format(
-                ripped_from,
-                source,)
+            description = f'关注{ripped_from}：{source}'
     try:
         tags = keystamps[ripped_from][2]
     except IndexError:
@@ -74,8 +70,7 @@ def bilibili_upload(
         tags = [ripped_from]
     title = media_basename[:media_basename.rfind('.')][:60]
     # title rework: [歌切][海德薇Hedvika] 20220608的直播歌曲
-    title = '[{}] {}的直播歌曲'.format(
-        tags[0], os.path.splitext(media_basename)[0][-8:])
+    title = f'[{ tags[0]}] {os.path.splitext(media_basename)[0][-8:]}的直播歌曲'
     title = media_basename[:media_basename.rfind('.')][:60].replace(
         ripped_from, tags[0]).replace('【直播回放】', '')
     globbed = sorted(globbed)
@@ -86,26 +81,28 @@ def bilibili_upload(
         globbed_episode_limit.append(
             globbed[i * episode_limit: (i + 1) * episode_limit])
 
+    def make_cmds(v):
+        cmd = ['biliup', 'upload',]
+        for x in v:
+            cmd.append(x)
+        cmd.extend([
+            '--copyright=2',
+            f'--desc={description}',
+            '--tid=31',
+            f'--tag={",".join(tags)}',
+            f'--title=[歌切] {title[:60]}{episode_limit_prefix}',
+            f'--source={source}',
+            f'-l={route}',
+        ])
+        return cmd
+
     for i, v in enumerate(globbed_episode_limit):
         if i > 0:
             episode_limit_prefix = '_' + chr(97 + i)
         else:
             episode_limit_prefix = ''
         retry = 0
-        cmd = [
-            'biliup',
-            'upload',
-        ]
-        for x in v:
-            cmd.append(x)
-        cmd.append('--copyright=2')
-        cmd.append('--desc={}'.format(description))
-        cmd.append('--tid=31')
-        cmd.append('--tag={}'.format(','.join(tags)))
-        cmd.append('--title=[歌切]{}'.format(title[:60] + episode_limit_prefix))
-        cmd.append('--source={}'.format(source))
-        cmd.append('-l=' + route)
-
+        cmd = make_cmds(v)
         if useCelery:
             # use inaCelery
             relocated_dir_on_fail = os.path.join(
@@ -122,20 +119,7 @@ def bilibili_upload(
             for index, item in enumerate(globbed_episode_limit[i]):
                 globbed_episode_limit[i][index] = os.path.join(
                     relocated_dir_on_fail, os.path.basename(item))
-            cmd = [
-                'biliup',
-                'upload',
-            ]
-            for x in globbed_episode_limit[i]:
-                cmd.append(x)
-            cmd.append('--copyright=2')
-            cmd.append('--desc={}'.format(description))
-            cmd.append('--tid=31')
-            cmd.append('--tag={}'.format(','.join(tags)))
-            cmd.append(
-                '--title=[歌切]{}'.format(title[:60] + episode_limit_prefix))
-            cmd.append('--source={}'.format(source))
-            cmd.append('-l=' + route)
+            cmd = make_cmds(v)
             logging.info(['deferring', cmd, 'to celery:'])
             with open(os.path.join(relocated_dir_on_fail, 'cmd.txt'), 'w') as f:
                 json.dump(cmd, f)
