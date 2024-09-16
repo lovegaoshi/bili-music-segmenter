@@ -263,8 +263,12 @@ class BilibiliChannelIE(BiliInfoExtractor):
                 {parsed_url.path}?{get_query(qs2)}'
             print(['extract API', newapiurl])
             k = requests.get(newapiurl, headers=headers)
-            parsed, return_signal = self.parse_json(
-                json_obj=k, stop_after=stop_after)
+            try:
+                parsed, return_signal = self.parse_json(
+                    json_obj=k, stop_after=stop_after)
+            except requests.exceptions.JSONDecodeError:
+                print(k.text())
+                raise
             r += parsed
             if return_signal:
                 return r

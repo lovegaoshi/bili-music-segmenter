@@ -9,7 +9,7 @@ import shutil
 from network.watcher import watch
 from network.constants import DEFAULT_UI
 
-GET_CID_URL = "http://api.bilibili.com/x/web-interface/view?bvid={}"
+GET_CID_URL = "https://api.bilibili.com/x/web-interface/view?bvid={}"
 GET_TAG_URL = "https://api.bilibili.com/x/web-interface/view/detail/tag?bvid={}&cid={}"
 BILI_SHAZAM_TAG_TYPE = 'bgm'
 BVID_RE_STR = 'BV[^\/]+'
@@ -18,7 +18,8 @@ def get_cid_list_from_bvid(bvid: str = 'BV1A24y1s7r7') -> list:
     time.sleep(0.2)
     r = requests.get(GET_CID_URL.format(bvid), headers=DEFAULT_UI)
     res = r.json()
-    return [[res['data']['bvid'], str(page['cid']), str(page['page'])] for page in res['data']['pages']]
+    return [[res['data']['bvid'], str(page['cid']), str(page['page'])]
+    for page in res['data']['pages']]
 
 def get_cid_list_from_bvids(bvids: list = []) -> list:
     result = []
@@ -56,7 +57,8 @@ def get_bilitag_bvid(bvid, tag_dict = None):
 
 
 def get_bilitag_cycle(tag_dict = None, bvids = None):
-    if tag_dict is None: tag_dict = {}
+    if tag_dict is None:
+        tag_dict = {}
     # json.load(open('bili_tag_fix_data1.json'))#
     try:
         if bvids is None:
