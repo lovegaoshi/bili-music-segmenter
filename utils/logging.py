@@ -1,6 +1,6 @@
 import os
 
-from noxsegutils.extractor import load_config, save_config
+from network.extractor import load_config, save_config
 
 
 SAVE_YAML_PATH = os.path.join(

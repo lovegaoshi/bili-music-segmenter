@@ -4,7 +4,7 @@ import urllib.parse
 import time
 import requests
 
-from constants import DEFAULT_UI
+from network.constants import DEFAULT_UI
 
 mixinKeyEncTab = [
     46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,

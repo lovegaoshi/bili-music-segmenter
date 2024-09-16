@@ -7,7 +7,7 @@ import logging
 from datetime import timedelta
 import math
 
-from noxsegutils.timestamp import timestamp2sec
+from utils.timestamp import timestamp2sec
 
 def get_length(filename):
     if not filename:

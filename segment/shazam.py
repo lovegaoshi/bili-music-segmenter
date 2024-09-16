@@ -8,7 +8,7 @@ import requests
 import asyncio
 from shazamio import Shazam
 
-from noxsegutils.logging import save_timestamps
+from utils.logging import save_timestamps
 
 
 semaphore = asyncio.Semaphore(3)

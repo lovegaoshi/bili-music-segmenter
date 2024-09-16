@@ -1,6 +1,7 @@
 import time
 import os
-from noxsegutils.extractor import WATCHER_CONFIG_DIR as CONFIG_DIREC, EXTRACTORS, FILTERS, load_config, save_config
+from network.extractor import WATCHER_CONFIG_DIR as CONFIG_DIREC, EXTRACTORS, FILTERS,\
+    load_config, save_config
 import logging
 from datetime import datetime
 
@@ -42,7 +43,7 @@ def watch(config_dir=CONFIG_DIREC):
 
 
 if __name__ == '__main__':
-    from biliupWrapper import InaBiliup
+    from biliup import InaBiliup
     # print(watch())
     import argparse
     import sys

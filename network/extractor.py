@@ -10,9 +10,9 @@ import json
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-from wbi import get_query
-from constants import DEFAULT_UI
-from cookieformatter import biliup_to_string
+from network.wbi import get_query
+from network.constants import DEFAULT_UI
+from network.cookieformatter import biliup_to_string
 
 '''
 from inaConstant import EXTRACTORS
