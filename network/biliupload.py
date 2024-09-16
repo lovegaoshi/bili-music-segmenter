@@ -3,7 +3,7 @@ import logging
 import json
 import os
 
-from inacelery import add
+from celery.inacelery import add
 from network.extractor import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 from utils.process import cell_stdout
 

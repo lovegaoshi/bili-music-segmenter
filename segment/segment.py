@@ -6,7 +6,7 @@ import gc
 import logging
 import tensorflow as tf
 
-from utils.util import get_segment_process_length_array, ffmpeg
+from utils.ffmpeg import get_segment_process_length_array, ffmpeg
 from utils.timestamp import fix_missing_stamps, sec2timestamp
 from utils.logging import save_timestamps
 

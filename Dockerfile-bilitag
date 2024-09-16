@@ -1,0 +1,5 @@
+FROM python:3.11
+RUN pip install requests pyyaml
+WORKDIR /app
+COPY . /app
+CMD python bilitagfixer.py
