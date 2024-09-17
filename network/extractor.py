@@ -202,7 +202,7 @@ class BilibiliEpisodesIE(BiliInfoExtractor):
             stop_after: str = None,
             time_wait=0.5) -> list:
         r = []
-        k = requests.get(self._API.format(*args))
+        k = requests.get(self._API.format(*args), headers=DEFAULT_UI)
         try:
             parsed, return_signal = self.parse_json(
                 json_obj=k, stop_after=stop_after, bvid=args[0])
