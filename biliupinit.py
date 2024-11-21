@@ -5,7 +5,7 @@ import os
 
 subprocess.call(
     r'curl -s https://api.github.com/repositories/437055168/releases/latest \
-| grep "browser_download_url.*x86_64-linux\.tar\.xz" \
+| grep "browser_download_url.*x86_64-linux-musl\.tar\.xz" \
 | cut -d : -f 2,3 | tr -d \"  | wget -qi -', shell=True)
 biliup_tar_path = glob.glob('biliupR*')[0]
 tarfile.open(biliup_tar_path).extractall()
