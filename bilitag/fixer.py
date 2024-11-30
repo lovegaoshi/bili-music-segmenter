@@ -36,7 +36,7 @@ def get_tag_from_cid_bvid(bvid: str, cid: str, timeout: float = 1.0) -> str|None
         r = requests.get(GET_TAG_URL.format(bvid, cid), headers=DEFAULT_UI).json()
         tag = r['data'][0]
         if tag['tag_type'] == BILI_SHAZAM_TAG_TYPE: 
-            return tag['tag_name']
+            return tag['tag_name'][3:-1]
     except:
         logging.error(f'bvid:{bvid} cid:{cid} failed to fetch bili get tag.')
     return None
