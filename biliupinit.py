@@ -10,6 +10,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '--system', type=str, default=r'x86_64-linux-musl.tar.xz',
     )
+    parser.add_argument(
+        '--sudocp', type=bool, default=False, action='store_false'
+    )
     args = parser.parse_args()
 
     req = requests.get('https://api.github.com/repositories/437055168/releases/latest').json()
@@ -19,4 +22,7 @@ if __name__ == '__main__':
     tarfile.open(biliup_tar_path).extractall()
     os.remove(biliup_tar_path)
     for file in glob.glob('biliupR*/*'):
-        os.rename(file, os.path.join('/bin', os.path.basename(file)))
+        if args.sudocp:
+            subprocess.call(['sudo', 'mv', file, '/bin'])
+        else:
+            os.rename(file, os.path.join('/bin', os.path.basename(file)))

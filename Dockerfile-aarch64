@@ -3,7 +3,6 @@ RUN sudo groupmod -g 1001 ubuntu
 RUN sudo usermod -u 1001 -g 1001 ubuntu
 RUN sudo apt-get update --allow-insecure-repositories
 RUN sudo apt-get -y --allow-unauthenticated install ffmpeg aria2 wget nano git
-RUN sudo /home/ubuntu/python3-venv/python3 /inaseg/biliupinit.py --system aarch64-linux.tar.xz
 WORKDIR /inaseg
 RUN git clone https://github.com/lovegaoshi/inaSpeechSegmenter.git
 RUN cd inaSpeechSegmenter; pip install .
@@ -11,3 +10,4 @@ COPY ./requirements.txt /inaseg/requirements.txt
 RUN pip3 install -r /inaseg/requirements.txt
 RUN pip3 install --force-reinstall git+https://github.com/grqz/yt-dlp.git@ie/bilibili/pi_fallbk
 COPY . /inaseg
+RUN python3 /inaseg/biliupinit.py --system aarch64-linux.tar.xz
