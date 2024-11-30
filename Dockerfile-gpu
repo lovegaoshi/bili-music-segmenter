@@ -11,5 +11,3 @@ RUN pip3 install --force-reinstall git+https://github.com/grqz/yt-dlp.git@ie/bil
 RUN wget https://getsamplefiles.com/download/mp3/sample-1.mp3 -P /home
 COPY . /inaseg
 RUN python3 /inaseg/biliupinit.py
-# Testing
-RUN python3 /inaseg/inaseg.py --media /home/sample-1.mp3
