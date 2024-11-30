@@ -11,7 +11,7 @@ if __name__ == '__main__':
         '--system', type=str, default=r'x86_64-linux-musl.tar.xz',
     )
     parser.add_argument(
-        '--sudocp', type=bool, default=False, action='store_false'
+        '--sudocp', default=False, action='store_false'
     )
     args = parser.parse_args()
 
