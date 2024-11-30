@@ -7,6 +7,8 @@ RUN cd inaSpeechSegmenter; pip install .
 RUN pip3 install pandas==2.0.0
 COPY ./requirements.txt /inaseg/requirements.txt
 RUN pip3 install -r /inaseg/requirements.txt
+# fix numpy to be 1.23.0; inaspeechsegmenter uses a deprecated feature that breaks on numpy > 2
+RUN pip3 install numpy==1.23.0
 RUN pip3 install --force-reinstall git+https://github.com/grqz/yt-dlp.git@ie/bilibili/pi_fallbk
 RUN wget https://getsamplefiles.com/download/mp3/sample-1.mp3 -P /home
 COPY . /inaseg
