@@ -7,3 +7,5 @@ regex
 requests
 celery
 sqlalchemy==1.4.46
+scikit-image
+numpy==1.23.0
