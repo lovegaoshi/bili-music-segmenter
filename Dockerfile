@@ -1,6 +1,6 @@
 FROM tensorflow/tensorflow:2.18.0
-RUN sudo apt-get update --allow-insecure-repositories
-RUN sudo apt-get -y --allow-unauthenticated install ffmpeg aria2 wget nano git
+RUN apt-get update --allow-insecure-repositories
+RUN apt-get -y --allow-unauthenticated install ffmpeg aria2 wget nano git
 WORKDIR /inaseg
 RUN git clone https://github.com/lovegaoshi/inaSpeechSegmenter.git
 RUN cd inaSpeechSegmenter; pip install .
