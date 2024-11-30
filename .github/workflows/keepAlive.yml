@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: docker pull
         run: docker pull gaoshi/ipynb-inaseg:nightly-gpu
-  docker-gpu:
+  docker-aarch64:
     runs-on: ubuntu-latest
     steps:
       - name: docker pull

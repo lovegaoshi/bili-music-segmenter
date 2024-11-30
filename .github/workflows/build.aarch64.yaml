@@ -1,7 +1,6 @@
 name: docker-aarch64
 
 on:
-  schedule:
   workflow_dispatch:
 
 jobs:
