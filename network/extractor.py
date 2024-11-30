@@ -259,8 +259,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
             print(parse_qs(parsed_url.query))
             qs = parse_qs(parsed_url.query)
             qs2 = {key: qs[key][0] for key in qs}
-            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}\
-                {parsed_url.path}?{get_query(qs2)}'
+            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{get_query(qs2)}'
             print(['extract API', newapiurl])
             k = requests.get(newapiurl, headers=headers)
             try:
