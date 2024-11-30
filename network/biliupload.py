@@ -20,7 +20,7 @@ def bilibili_upload(
         description=None,
         episode_limit=180,
         route='qn',
-        useCelery=False):
+        useCelery=True):
     # because my ytbdl template is always "[uploader] title.mp4" I can extract
     # out uploader like this and use as a tag:
     keystamps = json.load(open(CONFIG_DIREC, encoding='utf-8'))
