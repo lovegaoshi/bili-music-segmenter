@@ -20,7 +20,7 @@ class InaBiliup():
         episode_limit: int = 180,
         shazam_thread: int = min(max(multiprocessing.cpu_count(), 1), 4),
         ignore_errors: bool = True,
-        sound_only: str = '-f bestaudio',
+        sound_only: str = '',
         route: str = BILIUP_ROUTE,
         cleanup: bool = True,
         no_biliup: bool = False,
