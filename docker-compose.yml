@@ -9,6 +9,17 @@ services:
     user: "1001:1001"
     command: python /inaseg/watcher.py --watch_interval=600 --usecelery
     restart: unless-stopped
+  inaremotewatch:
+    build: 
+      context: .
+      dockerfile: Dockerfile-aarch64
+    volumes:
+      - ./bilicelerydb.sqlite:/inaseg/bilicelerydb.sqlite
+      - ./configs-remote:/inaseg/configs
+      - ./inaseg.log:/inaseg/inaseg.log
+    user: "1001:1001"
+    command: python /inaseg/watcher.py --watch_interval=86400 --usecelery
+    restart: unless-stopped
   bilitagfixer:
     build:
       context: .
