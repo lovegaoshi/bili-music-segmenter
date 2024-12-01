@@ -20,6 +20,7 @@ def retry_upload(cmd):
 
 @app.task
 def add(cmd):
+    subprocess.call(['biliup', 'renew'])
     cmd = json.loads(cmd)
     retry_upload(cmd)
     logging.info([cmd, 'completed.'])

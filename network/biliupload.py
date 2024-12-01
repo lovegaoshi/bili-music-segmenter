@@ -3,7 +3,7 @@ import logging
 import json
 import os
 
-from celery.inacelery import add
+from inacelery.celery import add
 from network.extractor import WRAPPER_CONFIG_DIR as CONFIG_DIREC
 from utils.process import cell_stdout
 
@@ -20,7 +20,7 @@ def bilibili_upload(
         description=None,
         episode_limit=180,
         route='qn',
-        useCelery=False):
+        useCelery=True):
     # because my ytbdl template is always "[uploader] title.mp4" I can extract
     # out uploader like this and use as a tag:
     keystamps = json.load(open(CONFIG_DIREC, encoding='utf-8'))
@@ -102,7 +102,6 @@ def bilibili_upload(
                 json.dump(cmd, f)
             add.delay(json.dumps(cmd))
             return
-
         while cell_stdout(cmd, encoding="utf-8") != 0:
             rescue = []
             for item in globbed_episode_limit[i]:

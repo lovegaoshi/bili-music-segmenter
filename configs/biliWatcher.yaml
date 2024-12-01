@@ -1,4 +1,6 @@
-- extractor: biliseries
-  filter: karaoke
-  last_url: true
-  url: https://space.bilibili.com/1112031857/channel/seriesdetail?sid=210571
+- extractor: glob
+  filter: null
+  last_url: "/recording/[Niya\u963F\u5E03] \u3010\u6B4C\u56DE\u3011\u8001\u5B9D\u8D1D\
+    \u6765\u4E86 2024-11-30 11-24-34.flv"
+  name: me!me!me!
+  url: /recording/*

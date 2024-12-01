@@ -11,7 +11,7 @@ from utils.timestamp import fix_missing_stamps, sec2timestamp
 from utils.logging import save_timestamps
 
 # 媒体流最大时长处理（秒）；1G内存的进程推荐用10分钟/600秒，16G可以支持5小时，6GB VRAM可以支持5小时左右。
-SEGMENT_THRES = 800
+SEGMENT_THRES = 12800
 # 识歌分段最小阈值（秒），调大了会漏 调小了会多杂谈
 EXTRACT_SEG_THRES = 60
 # 最终识歌分段最小阈值（秒），调大了漏TV size 调小了多杂谈
@@ -21,7 +21,7 @@ EXTRACT_SEG_CONNECT = 5
 # 大了会碎 小了会两首歌分不开
 ENERGY_RATIO = 0.03
 # 8GB VRAM 推荐 256
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 
 
 class TimestampMismatch(Exception):

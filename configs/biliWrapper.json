@@ -1,11 +1,83 @@
 {
+    "VIOMEAT": [
+        "na",
+        "na"
+    ],
     "贝萨Bessa": [
         "https://live.bilibili.com/22288476",
         "关注贝萨贝老师：https://space.bilibili.com/592726738/"
     ],
+    "霧切澪570": [
+        "https://live.bilibili.com/22890279",
+        "关注小猪：https://space.bilibili.com/1648978526/"
+    ],
+    "Niya阿布": [
+        "https://live.bilibili.com/685026",
+        "关注克勾好兄弟阿布：https://space.bilibili.com/188679"
+    ],
+    "薇Steria": [
+        "https://live.bilibili.com/22924075",
+        "关注VV：https://space.bilibili.com/1112031857"
+    ],
+    "第五灌灌": [
+        "https://live.bilibili.com/26924998",
+        "关注第五灌皇：https://space.bilibili.com/3493119043570098"
+    ],
+    "塞拉菲娜_Serafina": [
+        "https://live.bilibili.com/23941099",
+        "关注Serafina：https://space.bilibili.com/1025491703/"
+    ],
+    "帕莎Pasha": [
+        "https://live.bilibili.com/23368278?broadcast_type=0&is_room_feed=1",
+        "关注大帕哥：https://space.bilibili.com/1633779879"
+    ],
+    "-阿蕊娅Aria-": [
+        "https://live.bilibili.com/594461",
+        "关注小美人鱼阿蕊娅Aria：https://space.bilibili.com/10850238"
+    ],
+    "花见深雪_official": [
+        "https://live.bilibili.com/24688068",
+        "关注雪宝花见深雪：https://space.bilibili.com/1897506398/dynamic"
+    ],
+    "舒三妈Susam": [
+        "https://live.bilibili.com/3032130",
+        "关注三妈：https://space.bilibili.com/6853766"
+    ],
+    "诺亚方舟映像院": [
+        "https://live.bilibili.com/251015",
+        "关注黑泽诺亚NOIR泽宝：https://space.bilibili.com/922573/channel/series",
+        [
+            "黑泽诺亚NOIR"
+        ]
+    ],
+    "全自动bot": [
+        "https://live.bilibili.com/251015",
+        "关注黑泽诺亚NOIR泽宝：https://space.bilibili.com/922573/channel/series",
+        [
+            "黑泽诺亚NOIR"
+        ]
+    ],
+    "Gawr Gura Ch. hololive-EN": [
+        "https://www.youtube.com/channel/UCoSrY_IQQVpmIRZ9Xf-y93g",
+        "关注Gawr Gura鲨鲨：https://www.youtube.com/channel/UCoSrY_IQQVpmIRZ9Xf-y93g",
+        [
+            "Gawr Gura"
+        ]
+    ],
+    "蘸术核咸卡": [
+        "https://www.youtube.com/channel/UCoSrY_IQQVpmIRZ9Xf-y93g",
+        "关注Gawr Gura鲨鲨：https://www.youtube.com/channel/UCoSrY_IQQVpmIRZ9Xf-y93g",
+        [
+            "Gawr Gura"
+        ]
+    ],
     "诺莺Nox": [
         "https://live.bilibili.com/282208",
         "关注诺莺Nox闹闹：https://space.bilibili.com/529249"
+    ],
+    "海德薇Hedvika": [
+        "https://live.bilibili.com/24088644",
+        "关注海德薇海老师：https://space.bilibili.com/1285890335/"
     ],
     "海德薇的录播组": [
         "https://live.bilibili.com/24088644",
@@ -14,11 +86,15 @@
             "海德薇Hedvika"
         ]
     ],
+    "林莉奈RinaHayashi": [
+        "https://live.bilibili.com/22742508",
+        "关注林莉奈RinaHayashi大莉：https://space.bilibili.com/1243266187"
+    ],
     "末莱Moonlight": [
         "https://live.bilibili.com/24463489",
         "关注末莱Moonlight木老师：https://space.bilibili.com/476185026"
     ],
-    "范塞尼尔录播组": [
+    "范塞尼尔_VamSenior": [
         "https://live.bilibili.com/24963677",
         "关注范塞尼尔_VamSenior喵，关注范塞尼尔_VamSenior谢谢喵：https://space.bilibili.com/2042629175",
         [
@@ -51,11 +127,14 @@
     ],
     "YOSHIKA⁂Ch.": [
         "https://www.youtube.com/c/YOSHIKA-Ch",
-        "关注地瓜YOSHIKA:https://www.youtube.com/c/YOSHIKA-Ch"
+        "关注地瓜YOSHIKA:https://www.youtube.com/c/YOSHIKA-Ch",
+        [
+            "YOSHIKA"
+        ]
     ],
     "绯叶明依": [
         "https://live.bilibili.com/1921106",
-        "关注绯叶明依:https://space.bilibili.com/3526739/channel/seriesdetail?sid=2186460"
+        "关注枫叶妖精绯叶明依:https://space.bilibili.com/3526739/channel/seriesdetail?sid=2186460"
     ],
     "葡冷尔子gagako": [
         "https://live.bilibili.com/22857429",
@@ -63,6 +142,49 @@
     ],
     "哟蔻桃桃YOCO": [
         "https://live.bilibili.com/24849407",
-        "关注哟蔻桃桃YOCO:https://space.bilibili.com/1834090921/channel/seriesdetail?sid=2359028&ctype=0"
+        "关注哟蔻桃桃YOCO羽毛球:https://space.bilibili.com/1834090921/channel/seriesdetail?sid=2359028"
+    ],
+    "Era猩纪元": [
+        "https://live.bilibili.com/25660853",
+        "关注Era猩纪元猴老师:https://space.bilibili.com/652495460/dynamic",
+        [
+            "Era猩纪元",
+            "爵士"
+        ]
+    ],
+    "艾露露Ailurus": [
+        "https://live.bilibili.com/22746343",
+        "关注艾露露Ailurus266:https://space.bilibili.com/1501380958"
+    ],
+    "MUS1CA": [
+        "https://www.youtube.com/c/Vsingermusicachannel",
+        "关注漂亮又会唱歌的MUSICA姐姐:https://space.bilibili.com/2104742780"
+    ],
+    "綾音Aya": [
+        "https://live.bilibili.com/92450",
+        "关注綾音Aya土豆:https://space.bilibili.com/731556/channel/seriesdetail?sid=120117"
+    ],
+    "江崎Esaki97": [
+        "https://live.bilibili.com/25077199",
+        "关注江崎Esaki97江老师:https://space.bilibili.com/1426714555/"
+    ],
+    "Miori Celesta": [
+        "https://www.youtube.com/c/MioriCelesta",
+        "关注人美歌甜Miori Celesta:https://www.youtube.com/c/MioriCelesta"
+    ],
+    "桃几OvO": [
+        "https://live.bilibili.com/22642754",
+        "关注桃几OvO桃老师:https://space.bilibili.com/1104048496"
+    ],
+    "KANADE MiMi ch.": [
+        "https://www.youtube.com/c/KANADEMiMich",
+        "关注T0歌势奏咪咪:https://www.youtube.com/c/KANADEMiMich"
+    ],
+    "绯叶的日记本": [
+        "https://live.bilibili.com/1921106",
+        "关注枫叶妖精绯叶明依:https://space.bilibili.com/3526739/channel/seriesdetail?sid=2186460",
+        [
+            "绯叶明依"
+        ]
     ]
 }

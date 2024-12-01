@@ -13,6 +13,10 @@ GET_CID_URL = "https://api.bilibili.com/x/web-interface/view?bvid={}"
 GET_TAG_URL = "https://api.bilibili.com/x/web-interface/view/detail/tag?bvid={}&cid={}"
 BILI_SHAZAM_TAG_TYPE = 'bgm'
 BVID_RE_STR = 'BV[^\/]+'
+CONFIG_DIRNAME = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                'configs',
+                'biliTag.yaml')
 
 def get_cid_list_from_bvid(bvid: str = 'BV1A24y1s7r7') -> list:
     time.sleep(0.2)
@@ -36,7 +40,7 @@ def get_tag_from_cid_bvid(bvid: str, cid: str, timeout: float = 1.0) -> str|None
         r = requests.get(GET_TAG_URL.format(bvid, cid), headers=DEFAULT_UI).json()
         tag = r['data'][0]
         if tag['tag_type'] == BILI_SHAZAM_TAG_TYPE: 
-            return tag['tag_name']
+            return tag['tag_name'][3:-1]
     except:
         logging.error(f'bvid:{bvid} cid:{cid} failed to fetch bili get tag.')
     return None
@@ -62,28 +66,13 @@ def get_bilitag_cycle(tag_dict = None, bvids = None):
     # json.load(open('bili_tag_fix_data1.json'))#
     try:
         if bvids is None:
-            bvids = watch(
-            os.path.join(
-                os.path.dirname(
-                    os.path.abspath(__file__)),
-                'configs',
-                'biliTag.yaml')
-            )
+            bvids = watch(CONFIG_DIRNAME)
         reqs = get_cid_list_from_bvids(bvids)
     except Exception as e:
         logging.error(e)
         time.sleep(100)
-        if not os.path.isfile(os.path.join(os.path.dirname(
-                    os.path.abspath(__file__)),
-                'configs',
-                'biliTag.yaml')):
-            shutil.copy2(os.path.join(os.path.dirname(
-                    os.path.abspath(__file__)),
-                'configs',
-                'biliTag.yaml.old'),os.path.join(os.path.dirname(
-                    os.path.abspath(__file__)),
-                'configs',
-                'biliTag.yaml'))
+        if not os.path.isfile(CONFIG_DIRNAME):
+            shutil.copy2(CONFIG_DIRNAME + '.old', CONFIG_DIRNAME)
         reqs = []
     reqlen = str(len(reqs))
     for index, bvid_cid_pair in enumerate(reqs):

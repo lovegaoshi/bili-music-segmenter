@@ -254,13 +254,13 @@ class BilibiliChannelIE(BiliInfoExtractor):
             headers = {**DEFAULT_UI, 'cookie': biliup_to_string()}
         for i in range(999):
             apiurl = self._API.format(*args, page=str(i + 1))
+            print(args, [apiurl])
             parsed_url = urlparse(apiurl)
             logging.debug(['extract API', apiurl])
             print(parse_qs(parsed_url.query))
             qs = parse_qs(parsed_url.query)
             qs2 = {key: qs[key][0] for key in qs}
-            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}\
-                {parsed_url.path}?{get_query(qs2)}'
+            newapiurl = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{get_query(qs2)}'
             print(['extract API', newapiurl])
             k = requests.get(newapiurl, headers=headers)
             try:

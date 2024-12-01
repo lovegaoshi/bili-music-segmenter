@@ -1,16 +1,40 @@
-version: "3.9"
 services:
-  inaseg:
-    build: .
+  inawatch:
+    build: 
+      context: .
+      dockerfile: Dockerfile-aarch64
     volumes:
       - .:/inaseg
+      - /home/ubuntu/DDRecorder/recorded:/recording
     user: "1001:1001"
-    command: python /inaseg/watcher.py --watch_interval=43200
+    command: python /inaseg/watcher.py --watch_interval=600 --usecelery
     restart: unless-stopped
-  inacelery:
-    build: .
+  bilitagfixer:
+    build:
+      context: .
+      dockerfile: bilitag.Dockerfile
+    command: python3 bilitagfixer.py --watch_interval=86400
+    user: "1001:1001"
+    volumes:
+      - ./bili_tag_fix_tags.json:/app/bili_tag_fix_tags.json
+      - .:/app
+    restart: unless-stopped
+  inaupcelery:
+    build: 
+      context: .
+      dockerfile: Dockerfile-aarch64
     volumes:
       - .:/inaseg
     user: "1001:1001"
     command: celery -A inacelery worker -c 1 --loglevel=info
+    restart: unless-stopped
+  inasegcelery:
+    build: 
+      context: .
+      dockerfile: Dockerfile-aarch64
+    volumes:
+      - .:/inaseg
+      - /home/ubuntu/DDRecorder/recorded:/recording
+    user: "1001:1001"
+    command: celery -A biliupCelery worker -c 1 --loglevel=info
     restart: unless-stopped
