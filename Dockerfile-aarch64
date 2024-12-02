@@ -1,15 +1,16 @@
 FROM armswdev/tensorflow-arm-neoverse:r24.07-tf-2.16.1-eigen
 RUN sudo groupmod -g 1001 ubuntu
 RUN sudo usermod -u 1001 -g 1001 ubuntu
+# something's weird about this image; dunno how to fix
 RUN sudo apt-get update --allow-insecure-repositories
 RUN sudo apt-get -y --allow-unauthenticated install ffmpeg aria2 wget nano git
 WORKDIR /inaseg
 RUN git clone https://github.com/lovegaoshi/inaSpeechSegmenter.git
 RUN cd inaSpeechSegmenter; pip install .
 COPY ./requirements.txt /inaseg/requirements.txt
-# fix numpy to be 1.23.0; inaspeechsegmenter uses a deprecated feature that breaks on numpy > 2
-RUN pip3 install numpy==1.23.0
 RUN pip3 install -r /inaseg/requirements.txt
+# fix numpy to be 1.26; inaspeechsegmenter uses a deprecated feature that breaks on numpy > 2
+RUN pip3 install numpy==1.26.3
 RUN pip3 install --force-reinstall git+https://github.com/grqz/yt-dlp.git@ie/bilibili/pi_fallbk
 COPY . /inaseg
 RUN python3 /inaseg/biliupinit.py --system aarch64-linux.tar.xz --sudocp
