@@ -1,3 +1,5 @@
+自用 适用于oracle ARM A1 flex 4C24G的实例 嘻嘻
+
 # 在云服务器上用 docker 部署
 
 参考配置：1 核 1GB 内存 ubuntu22 云机器
