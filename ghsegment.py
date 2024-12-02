@@ -3,7 +3,7 @@
 import subprocess
 import json
 
-from ghsegment.constants import write_watched_URL, get_watched_URL, \
+from ghactions.constants import write_watched_URL, get_watched_URL, \
     write_biliup_data, get_biliup_data
 from network.download import ytbdl
 from utils.process import cell_stdout
