@@ -9,6 +9,5 @@ COPY ./requirements.txt /inaseg/requirements.txt
 RUN pip3 install -r /inaseg/requirements.txt
 # fix numpy to be 1.26; inaspeechsegmenter uses a deprecated feature that breaks on numpy > 2
 RUN pip3 install numpy==1.26.3
-RUN pip3 install --force-reinstall git+https://github.com/grqz/yt-dlp.git@ie/bilibili/pi_fallbk
 COPY . /inaseg
 RUN python3 /inaseg/biliupinit.py
