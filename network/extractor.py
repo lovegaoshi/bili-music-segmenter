@@ -189,6 +189,10 @@ class BilibiliChannelSeriesIE(BiliInfoExtractor):
                 return r, True
         return r, len(r) == 0
 
+class BilibiliChannelSeriesIENew(BilibiliChannelSeriesIE):
+    # https://space.bilibili.com/3493085134719196/lists/3865824?type=series
+    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/lists/(?P<listid>\d+)\?type=series'  # noqa: E501
+
 
 class BilibiliEpisodesIE(BiliInfoExtractor):
     # https://www.bilibili.com/video/BV1zP411V7ap
@@ -234,6 +238,9 @@ class BilibiliChannelCollectionsIE(BiliInfoExtractor):
     _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/channel/collectiondetail.+sid=(?P<listid>\d+)'  # noqa: E501
     _GROUPED_BY = ['userid', 'listid']
     _API = r'https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid={}&season_id={}&sort_reverse=false&page_num={page}&page_size=30'  # noqa: E501
+
+class BilibiliChannelCollectionsIENew(BilibiliChannelCollectionsIE):
+    _VALID_URL = r'https?://space.bilibili\.com/(?P<userid>\d+)/lists/(?P<listid>\d+)\?type=season'  # noqa: E501
 
 
 class BilibiliChannelIE(BiliInfoExtractor):
@@ -336,6 +343,8 @@ def url_filter(r: list, or_keywords: list = [], no_keywords: list = []) -> list:
 EXTRACTORS = {
     'biliseries': BilibiliChannelSeriesIE,
     'bilicolle': BilibiliChannelCollectionsIE,
+    'biliseries.new': BilibiliChannelSeriesIENew,
+    'bilicolle.new': BilibiliChannelCollectionsIENew,
     'biliepisode': BilibiliEpisodesIE,
     'bilichannel': BilibiliChannelIE,
     'glob': localGlob,
