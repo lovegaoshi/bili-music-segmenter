@@ -60,7 +60,7 @@ jobs:
           file: ./Dockerfile-gpu
 
   docker-aarch64:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
