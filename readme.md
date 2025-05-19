@@ -99,7 +99,8 @@ configs/biliWatcher.yaml：填监控的相关信息。格式为：
 
 监控 b 站录播合集
 
-`sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/watcher.py --watch_interval=12800`
+`sidp docker compose up -d`
+~sudo docker run -v "$(pwd)":/inaseg -u 1001:1001 --rm ipynb-inaseg python /inaseg/watcher.py --watch_interval=12800~
 
 # WINDOWS
 
