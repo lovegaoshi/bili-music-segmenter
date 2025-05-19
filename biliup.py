@@ -11,6 +11,7 @@ from utils.filename import strip_medianame_out, put_medianame_backin
 from utils.process import cell_stdout
 from network.biliupload import bilibili_upload, BILIUP_ROUTE
 
+
 class InaBiliup():
 
     def __init__(
@@ -24,6 +25,7 @@ class InaBiliup():
         route: str = BILIUP_ROUTE,
         cleanup: bool = True,
         no_biliup: bool = False,
+        use_celery: bool = True,
     ):
         self.cleanup = True  # False
         self.outdir = outdir
@@ -35,6 +37,7 @@ class InaBiliup():
         self.route = route
         self.cleanup = cleanup
         self.no_biliup = no_biliup
+        self.use_celery = use_celery
 
     def run(self):
         try:
@@ -70,7 +73,7 @@ class InaBiliup():
 
             bilibili_upload(
                 stripped_media_names, os.path.basename(media),
-                source=None, episode_limit=self.episode_limit)
+                source=None, episode_limit=self.episode_limit, useCelery=self.use_celery)
             logging.info(['finished stripping and uploading', media])
             if self.cleanup:
                 if os.path.isfile(media):
@@ -110,4 +113,4 @@ if __name__ == '__main__':
         logging.info(
             f'inaseging {media} at ' +
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        InaBiliup(media=media).run()
+        InaBiliup(media=media, use_celery=False).run()
