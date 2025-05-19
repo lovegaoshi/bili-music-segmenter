@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   inaseg:
+    image: ipynb-inaseg
     build: .
     volumes:
       - .:/inaseg
@@ -8,6 +9,7 @@ services:
     command: python /inaseg/watcher.py --watch_interval=43200
     restart: unless-stopped
   inacelery:
+    image: ipynb-inaseg
     build: .
     volumes:
       - .:/inaseg
