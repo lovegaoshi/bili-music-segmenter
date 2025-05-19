@@ -79,7 +79,7 @@ class InaBiliup():
                 if os.path.isfile(media):
                     os.remove(media)
                 for i in stripped_media_names:
-                    os.remove(i)
+                    os.path.isfile(i) and os.remove(i)
             else:
                 put_medianame_backin(
                     stripped_media_names, media,

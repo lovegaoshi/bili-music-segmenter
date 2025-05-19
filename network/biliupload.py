@@ -13,6 +13,7 @@ DEFAULT_SETTINGS = {
 BILIUP_ROUTE = 'qn'  # 'kodo'
 RETRY_ROUTES = DEFAULT_SETTINGS['biliup_routes']
 
+
 def bilibili_upload(
         globbed,
         media_basename,
@@ -87,7 +88,7 @@ def bilibili_upload(
                 'inaupload',
                 f'{title.replace(" ", "_")}'
             )
-            os.mkdir(relocated_dir_on_fail)
+            os.makedirs(relocated_dir_on_fail, exist_ok=True)
             for item in globbed_episode_limit[i]:
                 os.rename(
                     item,
@@ -114,7 +115,7 @@ def bilibili_upload(
             route = RETRY_ROUTES[retry % len(RETRY_ROUTES)]
             if retry > 15:
                 relocated_dir_on_fail = f'{title.replace(" ", "_")}'
-                os.mkdir(relocated_dir_on_fail)
+                os.makedirs(relocated_dir_on_fail, exist_ok=True)
                 for item in globbed_episode_limit[i]:
                     os.rename(item, os.path.join(
                         relocated_dir_on_fail, os.path.basename(item)))
