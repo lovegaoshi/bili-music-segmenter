@@ -1,7 +1,10 @@
 import subprocess
 import logging
+import time
 
 def cell_stdout(cmd, silent=False, encoding=None):
+    # add a 30min delay inbetween biliup uploads to avoid the ban hammer
+    time.sleep(1800)    
     logging.info(['calling', cmd, 'in terminal:'])
     with subprocess.Popen(cmd, stdout=subprocess.PIPE,
                           universal_newlines=True, encoding=encoding) as p:
