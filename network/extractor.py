@@ -258,7 +258,7 @@ class BilibiliChannelIE(BiliInfoExtractor):
             headers: dict = 0) -> list:
         r = []
         if headers == 0:
-            headers = {**DEFAULT_UI, 'cookie': biliup_to_string()}
+            headers = {**DEFAULT_UI, 'cookie': biliup_to_string(), 'referer': 'https://space.bilibili.com' }
         for i in range(999):
             apiurl = self._API.format(*args, page=str(i + 1))
             parsed_url = urlparse(apiurl)
