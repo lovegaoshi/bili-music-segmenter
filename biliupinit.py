@@ -15,7 +15,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    req = requests.get('https://api.github.com/repositories/437055168/releases/latest').json()
+    req = requests.get('https://api.github.com/repositories/116561419/releases/latest').json()
     targeted_download = list(filter(lambda x: args.system in x['name'], req['assets']))[0]
     subprocess.call(['wget', targeted_download['browser_download_url']])
     biliup_tar_path = glob.glob('biliupR*')[0]
